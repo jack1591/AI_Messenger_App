@@ -36,4 +36,8 @@ class MessageViewModel : ViewModel() {
             _messageResult.value = NetworkResponse.Error(e.message.toString())
         }
     }
+
+    fun clearResponse(){
+        _messageResult.value = NetworkResponse.Waiting
+    }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,19 +38,21 @@ import com.example.aimessengerapp.api.NetworkResponse
 import com.example.aimessengerapp.api.RequestModel
 
 @Composable
-fun MessengerPage(viewModel: MessageViewModel){
+fun MessengerPage(viewModel: MessageViewModel, chatViewModel: ChatViewModel){
 
     var request by remember{
         mutableStateOf("")
     }
 
+    /*
     val messages = remember{
-        mutableStateListOf<String>()
+        mutableStateListOf<Pair<String,Boolean>>()
     }
-
+     */
     val messageResult = viewModel.messageResult.observeAsState()
 
     val listState = rememberLazyListState()
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -57,13 +60,21 @@ fun MessengerPage(viewModel: MessageViewModel){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        LazyColumn(
+        Box(
             modifier = Modifier
-                //.weight(1f)
-                .padding(8.dp)
+                .weight(1f),
+            contentAlignment = Alignment.BottomEnd
         ) {
-            items(messages){ message ->
-                MessageBubble(message = message, messages.indexOf(message)%2 == 0)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalArrangement = Arrangement.Bottom,
+                state = listState
+            ) {
+                items(chatViewModel.messages) { message ->
+                    MessageBubble(message = message.first, message.second)
+                }
             }
         }
         Row(
@@ -85,17 +96,21 @@ fun MessengerPage(viewModel: MessageViewModel){
                 })
 
             IconButton(onClick = {
-                messages.add(request)
-                val requestModel = RequestModel(request)
-                viewModel.getData(requestModel)
-                request = ""
+                    if (request.length>0) {
+                        chatViewModel.addMessage(Pair(request, true))
+                        val requestModel = RequestModel(request)
+                        viewModel.getData(requestModel)
+                        request = ""
+                    }
             }) {
                 Icon(imageVector = Icons.Default.Search, contentDescription = "search_location")
             }
         }
+
         when (val result = messageResult.value){
             is NetworkResponse.Success -> {
-                messages.add(result.data.response.toString())
+                chatViewModel.addMessage(Pair(result.data.response.toString(),false))
+                viewModel.clearResponse()
             }
             is NetworkResponse.Error ->{
                 Text(text = result.message)
@@ -103,102 +118,16 @@ fun MessengerPage(viewModel: MessageViewModel){
             is NetworkResponse.Loading -> {
                 CircularProgressIndicator()
             }
-            null -> {}
-        }
-    }
+            is NetworkResponse.Waiting ->{
 
-}
-
-@Composable
-fun MessageBubble(
-    message: String,
-    isUser: Boolean
-){
-    Row (
-        modifier = Modifier
-            .fillMaxWidth(),
-        //horizontalArrangement = Arrangement.Start
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
-    ){
-        Box(
-            modifier = Modifier
-                //.fillMaxWidth()
-                .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
-                .padding(15.dp)
-        ) {
-
-            Text(text = message, fontSize = 16.sp, color = Color.Black)
-        }
-    }
-}
-
-
-
-
-/*
-Scaffold (
-    bottomBar = {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    value = request,
-                    onValueChange = {
-                        request = it
-                    },
-                    label = {
-                        Text(text = "ask something")
-                    })
-
-                IconButton(onClick = {
-                    val requestModel = RequestModel(request)
-                    viewModel.getData(requestModel)
-                }) {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "search_location")
-                }
-            }
-        }
-    }
-)
-{   padding ->
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        when (val result = messageResult.value){
-            is NetworkResponse.Success -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
-                        .padding(12.dp)
-                ) {
-                    Text(text = result.data.response.toString(), fontSize = 16.sp, color = Color.Black)
-                }
-
-            }
-            is NetworkResponse.Error ->{
-                Text(text = result.message)
-            }
-            is NetworkResponse.Loading -> {
-                CircularProgressIndicator()
             }
             null -> {}
         }
     }
+    
+    LaunchedEffect(chatViewModel.messages.size) {
+        if (chatViewModel.messages.size > 0)
+        listState.animateScrollToItem(chatViewModel.messages.size-1)
+    }
 }
- */
+

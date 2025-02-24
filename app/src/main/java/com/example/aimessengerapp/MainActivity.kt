@@ -17,10 +17,11 @@ import com.example.aimessengerapp.ui.theme.AIMessengerAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val messageViewModel = ViewModelProvider(this)[MessageViewModel::class.java]
+        val chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MessengerPage(messageViewModel)
+            MessengerPage(messageViewModel,chatViewModel)
         }
     }
 }
