@@ -1,4 +1,4 @@
-package com.example.aimessengerapp
+package com.example.aimessengerapp.ViewModel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel

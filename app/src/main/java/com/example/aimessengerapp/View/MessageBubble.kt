@@ -1,4 +1,4 @@
-package com.example.aimessengerapp
+package com.example.aimessengerapp.View
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.example.aimessengerapp
+package com.example.aimessengerapp.ViewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -72,4 +72,5 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:$retrofitVersion")
     implementation("androidx.compose.runtime:runtime-livedata:1.7.8")
     implementation ("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation ("androidx.navigation:navigation-compose:2.7.2")
 }

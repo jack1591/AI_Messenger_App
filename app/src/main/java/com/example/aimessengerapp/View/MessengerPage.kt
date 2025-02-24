@@ -1,39 +1,29 @@
-package com.example.aimessengerapp
+package com.example.aimessengerapp.View
 
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import com.example.aimessengerapp.ViewModel.ChatViewModel
+import com.example.aimessengerapp.ViewModel.MessageViewModel
 import com.example.aimessengerapp.api.NetworkResponse
 import com.example.aimessengerapp.api.RequestModel
 
@@ -44,14 +34,12 @@ fun MessengerPage(viewModel: MessageViewModel, chatViewModel: ChatViewModel){
         mutableStateOf("")
     }
 
-    /*
-    val messages = remember{
-        mutableStateListOf<Pair<String,Boolean>>()
-    }
-     */
     val messageResult = viewModel.messageResult.observeAsState()
 
-    val listState = rememberLazyListState()
+    //var currentScreen by remember { mutableStateOf("screen1") }
+    var isVisibleRAG = remember{
+        mutableStateOf(false)
+    }
 
     Column (
         modifier = Modifier
@@ -60,23 +48,11 @@ fun MessengerPage(viewModel: MessageViewModel, chatViewModel: ChatViewModel){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        Box(
-            modifier = Modifier
-                .weight(1f),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                verticalArrangement = Arrangement.Bottom,
-                state = listState
-            ) {
-                items(chatViewModel.messages) { message ->
-                    MessageBubble(message = message.first, message.second)
-                }
-            }
-        }
+        if (! isVisibleRAG.value)
+            MessagesList(chatViewModel = chatViewModel)
+        else
+            PatternsRAGScreen()
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -94,9 +70,16 @@ fun MessengerPage(viewModel: MessageViewModel, chatViewModel: ChatViewModel){
                 label = {
                     Text(text = "ask something")
                 })
-
+            Button(modifier = Modifier
+                .padding(5.dp),
+                onClick = {
+                    isVisibleRAG.value = ! isVisibleRAG.value
+                }
+            ) {
+                Text(text = "RAG", fontSize = 10.sp)
+            }
             IconButton(onClick = {
-                    if (request.length>0) {
+                    if (request.isNotEmpty()) {
                         chatViewModel.addMessage(Pair(request, true))
                         val requestModel = RequestModel(request)
                         viewModel.getData(requestModel)
@@ -123,11 +106,6 @@ fun MessengerPage(viewModel: MessageViewModel, chatViewModel: ChatViewModel){
             }
             null -> {}
         }
-    }
-    
-    LaunchedEffect(chatViewModel.messages.size) {
-        if (chatViewModel.messages.size > 0)
-        listState.animateScrollToItem(chatViewModel.messages.size-1)
     }
 }
 
