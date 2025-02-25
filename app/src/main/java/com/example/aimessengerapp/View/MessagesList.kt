@@ -19,13 +19,14 @@ fun MessagesList(chatViewModel: ChatViewModel){
     val listState = rememberLazyListState()
 
     Box(
-        modifier = Modifier,
+        modifier = Modifier
+            .padding(15.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(bottom = 10.dp),
             verticalArrangement = Arrangement.Bottom,
             state = listState
         ) {
