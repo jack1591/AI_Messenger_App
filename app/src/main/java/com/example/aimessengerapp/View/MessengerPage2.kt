@@ -53,8 +53,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -120,13 +118,16 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(bottom = padding.calculateBottomPadding()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
+            PatternScreen(ragViewModel = ragViewModel, type = "Person")
+            /*
             if (!ragViewModel.isRAG.value)
                 MessagesList(chatViewModel = chatViewModel)
             else PatternsRAGScreen()
+             */
         }
     }
 

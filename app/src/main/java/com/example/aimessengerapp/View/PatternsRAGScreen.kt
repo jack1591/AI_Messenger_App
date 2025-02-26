@@ -5,10 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,18 +19,23 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PatternsRAGScreen(){
+    val patternNames = mutableListOf<String>("Persons","Locations","Goals")
 
-    Column(
+    Box(
         modifier = Modifier
             .padding(bottom = 100.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
-
-        PatternBubble(name = "Person")
-        PatternBubble(name = "Place")
-        PatternBubble(name = "Goal")
-
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            items(patternNames) { patternName ->
+                PatternBubble(patternName)
+            }
+        }
     }
 
 }

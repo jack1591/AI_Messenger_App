@@ -22,7 +22,7 @@ fun MessageBubble(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 3.dp),
+            .padding(bottom = 6.dp),
         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
     ){
         if (isUser) {

@@ -21,7 +21,9 @@ fun PatternBubble(name: String){
         modifier = Modifier
             .size(100.dp)
             .padding(bottom = 20.dp)
-            .clickable { Log.i("RAG", "${name} is clicked") }
+            .clickable {
+
+            }
     ) {
 
         Box(
@@ -29,7 +31,7 @@ fun PatternBubble(name: String){
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Person")
+            Text(text = name)
         }
     }
 
