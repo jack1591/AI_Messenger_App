@@ -82,6 +82,18 @@ class RAGViewModel (
         }
     }
 
+    fun deletePerson(person: Person){
+        viewModelScope.launch {
+            personRepository.deletePerson(person)
+        }
+    }
+
+    fun updatePerson(person: Person){
+        viewModelScope.launch {
+            personRepository.updatePerson(person)
+        }
+    }
+
     fun addLocation(location: Location){
         viewModelScope.launch {
             locationRepository.addLocation(location)

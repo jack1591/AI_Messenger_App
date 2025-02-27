@@ -14,4 +14,16 @@ class PersonRepository(private val personDao: PersonDao) {
             personDao.insertPerson(person)
         }
     }
+
+    suspend fun deletePerson(person: Person){
+        withContext(Dispatchers.IO) {
+            personDao.deletePerson(person)
+        }
+    }
+
+    suspend fun updatePerson(person: Person){
+        withContext(Dispatchers.IO) {
+            personDao.updatePerson(person)
+        }
+    }
 }

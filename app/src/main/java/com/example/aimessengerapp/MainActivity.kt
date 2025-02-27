@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val database = AppDatabase.getDatabase(this)
+
         val personRepository = PersonRepository(database.personDao())
         val locationRepository = LocationRepository(database.locationDao())
         val goalRepository = GoalRepository(database.goalDao())
