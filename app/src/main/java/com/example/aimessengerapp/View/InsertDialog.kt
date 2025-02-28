@@ -5,17 +5,24 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.input.TextFieldValue
+import com.example.aimessengerapp.ViewModel.RAGViewModel
 
 @Composable
 fun InsertDialog(
+    model: RAGViewModel,
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ){
-    var textState by remember{
-        mutableStateOf(TextFieldValue(""))
+    val textState by model.dialogText.collectAsState()
+
+    /*
+    var textState by rememberSaveable{
+        mutableStateOf("")
     }
+     */
 
     if (showDialog){
         AlertDialog(
@@ -25,14 +32,14 @@ fun InsertDialog(
             text = {
                 OutlinedTextField(
                     value = textState,
-                    onValueChange = {textState = it}
+                    onValueChange = {model.updateDialogText(it)}
                 )
             },
-            onDismissRequest = { onDismiss() },
+            onDismissRequest = {  },
             confirmButton = {
                 Button(onClick = {
-                    onConfirm(textState.text)
-                    textState = TextFieldValue("")
+                    onConfirm(textState)
+                    model.clearDialogText()
                     onDismiss()
                 }) {
                     Text(text = "OK")

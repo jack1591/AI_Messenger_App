@@ -1,7 +1,9 @@
 package com.example.aimessengerapp.ViewModel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import android.util.Log
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +19,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class RAGViewModel (
-
     private val repository: RAGRepository
 ): ViewModel() {
 
@@ -29,9 +30,9 @@ class RAGViewModel (
     }
 
     private fun load() {
-        viewModelScope.launch(Dispatchers.IO) { // ✅ Запускаем в фоне
+        viewModelScope.launch(Dispatchers.IO) {
             repository.get().collectLatest { list ->
-                _ragObjects.value = list // ✅ Автоматически обновляет UI
+                _ragObjects.value = list
             }
         }
     }
@@ -54,14 +55,62 @@ class RAGViewModel (
         }
     }
 
+
+    private val _dialogText = MutableStateFlow("")
+    val dialogText: StateFlow<String> = _dialogText
+
+    fun updateDialogText(newText: String) {
+        _dialogText.value = newText
+    }
+
+    fun clearDialogText() {
+        _dialogText.value = ""
+    }
+
+    /*
+    var dialog_field by rememberSaveable {
+        mutableStateOf("")
+    }
+     */
+    //var showDialog by mutableStateOf(false)
+
+    private var _patternName = mutableStateOf<String>("")
+    val patternName = _patternName
+
+    fun choosePatternName(type: String) {
+        _patternName.value = type
+    }
+
+
+    private var _chosenName = mutableStateOf<String>("")
+    val chosenName = _chosenName
+
+    fun chooseNameToInsert(pair: Pair<String,String>) {
+        Log.i("patternName", pair.second)
+        if (pair.second=="Person")
+            _chosenName.value = "Imagine that you are a ${pair.first}. "
+        else if (pair.second=="Location")
+            _chosenName.value = "Imagine that you are in a ${pair.first}. "
+        else
+            _chosenName.value = "Tell me about ${pair.first}. "
+
+    }
+
+    fun clearChosenName(){
+        _chosenName.value=""
+    }
+
     private var _isRAG = mutableStateOf<Boolean>(false)
     val isRAG = _isRAG
 
     fun changeRAG() {
         _isRAG.value = !_isRAG.value
+        if (_isRAG.value==false)
+            choosePatternName("")
     }
 
     fun changeRAG_byvalue(_value: Boolean) {
         _isRAG.value = _value
+        choosePatternName("")
     }
 }

@@ -35,8 +35,9 @@ import com.example.aimessengerapp.ViewModel.RAGViewModel
 fun PatternObjectBubble(
     ragObject: RAGObject? = null,
     onUpdate: () -> Unit,
-    onDelete: () -> Unit
-){
+    onDelete: () -> Unit,
+    onInsert: () -> Unit
+    ){
     var showDialog by rememberSaveable{
         mutableStateOf(false)
     }
@@ -64,7 +65,7 @@ fun PatternObjectBubble(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { onInsert() }) {
                     Icon(imageVector = Icons.Default.Done, contentDescription = "send")
                 }
                 IconButton(onClick = { onUpdate() }) {

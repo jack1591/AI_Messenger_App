@@ -8,9 +8,9 @@ object RetrofitInstance {
     private val baseUrl = "http://94.126.205.209:8000"
 
     private val client: OkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(40,TimeUnit.SECONDS)
-        .writeTimeout(40, TimeUnit.SECONDS)
+        .connectTimeout(120, TimeUnit.SECONDS)
+        .readTimeout(120,TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
         .build()
 
     private fun getInstace(): Retrofit {

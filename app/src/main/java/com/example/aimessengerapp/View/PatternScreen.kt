@@ -35,11 +35,12 @@ import kotlinx.coroutines.flow.first
 
 @Composable
 fun PatternScreen(ragViewModel: RAGViewModel,type: String){
-    var objectName by remember{
+    var objectName by rememberSaveable{
         mutableStateOf("")
     }
 
     val ragObjects by ragViewModel.ragObjects.collectAsState(emptyList())
+
 
     var showDialog by rememberSaveable{
         mutableStateOf(false)
@@ -47,7 +48,7 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
 
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
 
-    var selectedObject by remember { mutableStateOf<RAGObject?>(null) }
+    var selectedObject by remember { mutableStateOf<RAGObject?>(RAGObject(name = "", type = "default")) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -68,7 +69,8 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
                             selectedObject =
                                 ragObject; ragViewModel.update(ragObject); showUpdateDialog = true
                         },
-                        onDelete = { ragViewModel.delete(ragObject) }
+                        onDelete = { ragViewModel.delete(ragObject) },
+                        onInsert = {ragViewModel.chooseNameToInsert(Pair(ragObject.name,type))}
                     )
                 }
             }
@@ -88,8 +90,9 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
     }
 
     InsertDialog(
+        model = ragViewModel,
         showDialog = showDialog,
-        onDismiss = { showDialog = false },
+        onDismiss = { ragViewModel.clearDialogText(); showDialog = false },
         onConfirm = { name ->
             if (name.isNotEmpty()) {
                 val objectModel = RAGObject(name = name, type = type)
@@ -97,9 +100,12 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
             }
         })
 
+    if (selectedObject != null)
         UpdateDialog(
+            model = ragViewModel,
+            name = selectedObject!!.name,
             showDialog = showUpdateDialog,
-            onDismiss = { showUpdateDialog = false },
+            onDismiss = { ragViewModel.clearDialogText(); showUpdateDialog = false },
             onConfirm = { newName ->
                 selectedObject?.let {
                     Log.i("textState", newName)

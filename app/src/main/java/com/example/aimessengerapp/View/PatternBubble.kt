@@ -16,13 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PatternBubble(name: String){
+fun PatternBubble(
+    type: String,
+    onChoose: () -> Unit,
+){
     OutlinedCard(
         modifier = Modifier
             .size(100.dp)
             .padding(bottom = 20.dp)
             .clickable {
-
+                onChoose()
             }
     ) {
 
@@ -31,7 +34,7 @@ fun PatternBubble(name: String){
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = name)
+            Text(text = type)
         }
     }
 

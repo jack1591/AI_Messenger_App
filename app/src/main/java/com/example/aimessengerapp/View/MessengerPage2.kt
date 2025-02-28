@@ -37,10 +37,11 @@ import com.example.aimessengerapp.api.RequestModel
 @Composable
 fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel) {
 
+    /*
     var request by remember{
         mutableStateOf("")
     }
-
+     */
     val messageResult = viewModel.messageResult.observeAsState()
 
     Scaffold(
@@ -61,11 +62,16 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                         verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.Center
                     ) {
+                        if (ragViewModel.chosenName.value!=""){
+                            viewModel.request+= ragViewModel.chosenName.value
+                            ragViewModel.clearChosenName()
+                        }
+
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = request,
+                            value = viewModel.request,
                             onValueChange = {
-                                request = it
+                                viewModel.request = it
                             },
                             label = {
                                 Text(text = "ask something")
@@ -81,11 +87,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
 
                         IconButton(onClick = {
                             ragViewModel.changeRAG_byvalue(false)
-                            if (request.isNotEmpty()) {
-                                chatViewModel.addMessage(Pair(request, true))
-                                val requestModel = RequestModel(request)
+                            if (viewModel.request.isNotEmpty()) {
+                                chatViewModel.addMessage(Pair(viewModel.request, true))
+                                val requestModel = RequestModel(viewModel.request)
                                 viewModel.getData(requestModel)
-                                request = ""
+                                viewModel.request = ""
                             }
                         }) {
                             Icon(
@@ -122,13 +128,15 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            PatternScreen(ragViewModel = ragViewModel, type = "Goal")
 
-            /*
-            if (!ragViewModel.isRAG.value)
-                MessagesList(chatViewModel = chatViewModel)
-            else PatternsRAGScreen()
-            */
+            if (ragViewModel.patternName.value!=""){
+                PatternScreen(ragViewModel = ragViewModel, type = ragViewModel.patternName.value)
+            }
+            else {
+                if (!ragViewModel.isRAG.value)
+                    MessagesList(chatViewModel = chatViewModel)
+                else PatternsRAGScreen(ragViewModel)
+            }
         }
     }
 

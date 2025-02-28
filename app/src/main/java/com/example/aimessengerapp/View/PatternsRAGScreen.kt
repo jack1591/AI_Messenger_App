@@ -16,10 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import com.example.aimessengerapp.ViewModel.RAGViewModel
 
 @Composable
-fun PatternsRAGScreen(){
-    val patternNames = mutableListOf<String>("Persons","Locations","Goals")
+fun PatternsRAGScreen(
+    ragViewModel: RAGViewModel
+){
+    val patternTypes = mutableListOf<String>("Person","Location","Goal")
 
     Box(
         modifier = Modifier
@@ -32,8 +35,8 @@ fun PatternsRAGScreen(){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            items(patternNames) { patternName ->
-                PatternBubble(patternName)
+            items(patternTypes) { patternType ->
+                PatternBubble(patternType, {ragViewModel.choosePatternName(patternType)})
             }
         }
     }

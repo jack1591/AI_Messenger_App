@@ -1,5 +1,6 @@
 package com.example.aimessengerapp.ViewModel
 
+import androidx.compose.runtime.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,13 @@ class MessageViewModel : ViewModel() {
     private val messageAPI = RetrofitInstance.messageApi
     private val _messageResult = MutableLiveData<NetworkResponse<ResponseModel>>()
     val messageResult : LiveData<NetworkResponse<ResponseModel>> = _messageResult
+
+    var request by mutableStateOf("")
+    /*
+    fun changeMessage(text: String){
+        message = text
+    }
+     */
 
     fun getData(requestModel: RequestModel){
         _messageResult.value = NetworkResponse.Loading
