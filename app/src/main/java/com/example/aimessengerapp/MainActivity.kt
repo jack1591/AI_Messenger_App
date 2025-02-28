@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
-import com.example.aimessengerapp.RAGRepositories.GoalRepository
-import com.example.aimessengerapp.RAGRepositories.LocationRepository
-import com.example.aimessengerapp.RAGRepositories.PersonRepository
+import com.example.aimessengerapp.RAGRepositories.RAGRepository
 import com.example.aimessengerapp.View.MessengerPage2
 import com.example.aimessengerapp.ViewModel.ChatViewModel
 import com.example.aimessengerapp.ViewModel.MessageViewModel
@@ -19,16 +17,16 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(this)
 
-        val personRepository = PersonRepository(database.personDao())
-        val locationRepository = LocationRepository(database.locationDao())
-        val goalRepository = GoalRepository(database.goalDao())
+        val repository = RAGRepository(database.ragDao())
+        val ragViewModel = ViewModelProvider(
+            this,
+            RAGViewModelFactory(repository)
+        )[RAGViewModel::class.java]
 
         val messageViewModel = ViewModelProvider(this)[MessageViewModel::class.java]
         val chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
-        val ragViewModel = ViewModelProvider(
-            this,
-            RAGViewModelFactory(personRepository, locationRepository, goalRepository)
-        )[RAGViewModel::class.java]
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

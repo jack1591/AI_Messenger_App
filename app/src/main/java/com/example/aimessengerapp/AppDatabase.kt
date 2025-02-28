@@ -4,18 +4,28 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.aimessengerapp.RAGRepositories.Goal
-import com.example.aimessengerapp.RAGRepositories.GoalDao
-import com.example.aimessengerapp.RAGRepositories.Location
-import com.example.aimessengerapp.RAGRepositories.LocationDao
-import com.example.aimessengerapp.RAGRepositories.Person
-import com.example.aimessengerapp.RAGRepositories.PersonDao
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.aimessengerapp.RAGRepositories.RAGDao
+import com.example.aimessengerapp.RAGRepositories.RAGObject
 
-@Database(entities = [Person::class, Location::class, Goal::class],version = 1, exportSchema = false)
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "CREATE TABLE ragObjects (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "name TEXT NOT NULL, " +
+                    "type TEXT NOT NULL)"
+        )
+        // Удаляем старую таблицу
+        database.execSQL("DROP TABLE jetpack")
+    }
+}
+
+@Database(entities = [RAGObject::class],version = 2, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
-    abstract fun personDao(): PersonDao
-    abstract fun locationDao(): LocationDao
-    abstract fun goalDao(): GoalDao
+    abstract fun ragDao(): RAGDao
 
     companion object{
         @Volatile
@@ -28,7 +38,8 @@ abstract class AppDatabase: RoomDatabase() {
             }
             synchronized(this) {
                 val instance = Room.databaseBuilder(context.applicationContext,
-                    AppDatabase::class.java, "jetpack")
+                    AppDatabase::class.java, "ragObjects")
+                    .addMigrations(MIGRATION_1_2)
                     .build()
                 INSTANCE = instance
                 return instance

@@ -8,12 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.aimessengerapp.RAGRepositories.Goal
-import com.example.aimessengerapp.RAGRepositories.GoalRepository
-import com.example.aimessengerapp.RAGRepositories.Location
-import com.example.aimessengerapp.RAGRepositories.LocationRepository
-import com.example.aimessengerapp.RAGRepositories.Person
-import com.example.aimessengerapp.RAGRepositories.PersonRepository
+import com.example.aimessengerapp.RAGRepositories.RAGObject
+import com.example.aimessengerapp.RAGRepositories.RAGRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,103 +17,40 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class RAGViewModel (
-    private val personRepository: PersonRepository,
-    private val locationRepository: LocationRepository,
-    private val goalRepository: GoalRepository
+
+    private val repository: RAGRepository
 ): ViewModel() {
 
-
-    private val _persons = MutableStateFlow<List<Person>>(emptyList()) // ✅ Используем Flow
-    val persons: StateFlow<List<Person>> = _persons
-
-    private val _locations = MutableStateFlow<List<Location>>(emptyList()) // ✅ Используем Flow
-    val locations: StateFlow<List<Location>> = _locations
-
-    private val _goals = MutableStateFlow<List<Goal>>(emptyList()) // ✅ Используем Flow
-    val goals: StateFlow<List<Goal>> = _goals
+    private val _ragObjects = MutableStateFlow<List<RAGObject>>(emptyList()) // ✅ Используем Flow
+    val ragObjects: StateFlow<List<RAGObject>> = _ragObjects
 
     init {
-        loadPersons()
-        loadLocations()
-        loadGoals()
+        load()
     }
 
-    private fun loadPersons(){
+    private fun load() {
         viewModelScope.launch(Dispatchers.IO) { // ✅ Запускаем в фоне
-            personRepository.getPersons().collectLatest { personsList ->
-                _persons.value = personsList // ✅ Автоматически обновляет UI
+            repository.get().collectLatest { list ->
+                _ragObjects.value = list // ✅ Автоматически обновляет UI
             }
         }
     }
 
-    private fun loadLocations(){
-        viewModelScope.launch(Dispatchers.IO) { // ✅ Запускаем в фоне
-            locationRepository.getLocations().collectLatest { locationsList ->
-                _locations.value = locationsList // ✅ Автоматически обновляет UI
-            }
-        }
-
-    }
-
-    private fun loadGoals(){
-        viewModelScope.launch(Dispatchers.IO) { // ✅ Запускаем в фоне
-            goalRepository.getGoals().collectLatest { goalsList ->
-                _goals.value = goalsList // ✅ Автоматически обновляет UI
-            }
-        }
-    }
-
-    fun addPerson(person: Person){
+    fun insert(ragObject: RAGObject) {
         viewModelScope.launch {
-            personRepository.addPerson(person)
+            repository.insert(ragObject)
         }
     }
 
-    fun deletePerson(person: Person){
+    fun delete(ragObject: RAGObject) {
         viewModelScope.launch {
-            personRepository.deletePerson(person)
+            repository.delete(ragObject)
         }
     }
 
-    fun updatePerson(person: Person){
+    fun update(ragObject: RAGObject) {
         viewModelScope.launch {
-            personRepository.updatePerson(person)
-        }
-    }
-
-    fun addLocation(location: Location){
-        viewModelScope.launch {
-            locationRepository.addLocation(location)
-        }
-    }
-
-    fun deleteLocation(location: Location){
-        viewModelScope.launch {
-            locationRepository.deleteLocation(location)
-        }
-    }
-
-    fun updateLocation(location: Location){
-        viewModelScope.launch {
-            locationRepository.updateLocation(location)
-        }
-    }
-
-    fun addGoal(goal: Goal){
-        viewModelScope.launch {
-            goalRepository.addGoal(goal)
-        }
-    }
-
-    fun deleteGoal(goal: Goal){
-        viewModelScope.launch {
-            goalRepository.deleteGoal(goal)
-        }
-    }
-
-    fun updateGoal(goal: Goal){
-        viewModelScope.launch {
-            goalRepository.updateGoal(goal)
+            repository.update(ragObject)
         }
     }
 
@@ -125,7 +58,7 @@ class RAGViewModel (
     val isRAG = _isRAG
 
     fun changeRAG() {
-        _isRAG.value = ! _isRAG.value
+        _isRAG.value = !_isRAG.value
     }
 
     fun changeRAG_byvalue(_value: Boolean) {

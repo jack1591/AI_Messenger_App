@@ -10,24 +10,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
-import com.example.aimessengerapp.RAGRepositories.Goal
-import com.example.aimessengerapp.RAGRepositories.Location
-import com.example.aimessengerapp.RAGRepositories.Person
+import com.example.aimessengerapp.RAGRepositories.RAGObject
+
 
 @Composable
 fun UpdateDialog(
-    person: Person? = null,
-    location: Location? = null,
-    goal: Goal? = null,
-
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ){
 
     var textState by remember{
-        mutableStateOf(TextFieldValue(person?.name ?: ""))
+        mutableStateOf(TextFieldValue( ""))
     }
+
     if (showDialog){
         AlertDialog(
             title = {
