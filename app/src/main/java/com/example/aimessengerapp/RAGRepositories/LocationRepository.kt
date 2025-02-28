@@ -14,4 +14,16 @@ class LocationRepository(private val locationDao: LocationDao) {
             locationDao.insertLocation(location)
         }
     }
+
+    suspend fun deleteLocation(location: Location){
+        withContext(Dispatchers.IO) {
+            locationDao.deleteLocation(location)
+        }
+    }
+
+    suspend fun updateLocation(location: Location){
+        withContext(Dispatchers.IO) {
+            locationDao.updateLocation(location)
+        }
+    }
 }

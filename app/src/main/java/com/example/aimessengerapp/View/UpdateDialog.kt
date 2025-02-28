@@ -1,6 +1,5 @@
 package com.example.aimessengerapp.View
 
-import android.util.Log
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -11,25 +10,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
+import com.example.aimessengerapp.RAGRepositories.Goal
+import com.example.aimessengerapp.RAGRepositories.Location
 import com.example.aimessengerapp.RAGRepositories.Person
 
 @Composable
-fun ChangePersonDialog(
-    person: Person?,
+fun UpdateDialog(
+    person: Person? = null,
+    location: Location? = null,
+    goal: Goal? = null,
+
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ){
+
     var textState by remember{
         mutableStateOf(TextFieldValue(person?.name ?: ""))
     }
-
     if (showDialog){
         AlertDialog(
             title = {
                 Text(text = "Изменение объекта")
             },
             text = {
+
                 OutlinedTextField(
                     value = textState,
                     onValueChange = {textState = it}
@@ -39,7 +44,6 @@ fun ChangePersonDialog(
             confirmButton = {
                 Button(onClick = {
                     onConfirm(textState.text)
-                    Log.i("textState",textState.text)
                     textState = TextFieldValue("")
                     onDismiss()
                 }) {

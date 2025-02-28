@@ -28,13 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aimessengerapp.RAGRepositories.Goal
+import com.example.aimessengerapp.RAGRepositories.Location
 import com.example.aimessengerapp.RAGRepositories.Person
 import com.example.aimessengerapp.ViewModel.RAGViewModel
 
 @Composable
 fun PatternObjectBubble(
-    person: Person,
-    onUpdate: (Person) -> Unit,
+    person: Person? = null,
+    location: Location? = null,
+    goal: Goal? = null,
+    type: String,
+    onUpdate: () -> Unit,
     onDelete: () -> Unit
 ){
     var showDialog by rememberSaveable{
@@ -58,7 +63,11 @@ fun PatternObjectBubble(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = person.name, fontSize = 16.sp)
+                if (type=="Person")
+                    Text(text = person!!.name, fontSize = 16.sp)
+                else if (type=="Location")
+                    Text(text = location!!.name, fontSize = 16.sp)
+                else Text(text = goal!!.name, fontSize = 16.sp)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -67,7 +76,7 @@ fun PatternObjectBubble(
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(imageVector = Icons.Default.Done, contentDescription = "send")
                 }
-                IconButton(onClick = { onUpdate(person) }) {
+                IconButton(onClick = { onUpdate() }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
                 }
                 IconButton(onClick = {

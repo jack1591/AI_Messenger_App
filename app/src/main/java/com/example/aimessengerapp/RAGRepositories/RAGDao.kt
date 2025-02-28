@@ -2,25 +2,23 @@ package com.example.aimessengerapp.RAGRepositories
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Entity
 import androidx.room.Insert
-import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface GoalDao {
-    @Query("SELECT * FROM goals")
-    fun getAllGoals():Flow<List<Goal>>
+interface RAGDao {
+    @Query("SELECT * FROM ragObjects")
+    fun getAllObjects(): Flow<List<RAGObject>>
 
     @Insert
-    suspend fun insertGoal(goal: Goal)
+    suspend fun insert(ragObject: RAGObject)
 
     @Delete
-    suspend fun deleteGoal(goal: Goal)
+    suspend fun delete(ragObject: RAGObject)
 
     @Update
-    suspend fun updateGoal(goal: Goal)
+    suspend fun update(ragObject: RAGObject)
 
 }

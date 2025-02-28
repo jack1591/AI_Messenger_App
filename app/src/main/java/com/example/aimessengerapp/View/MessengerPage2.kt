@@ -122,12 +122,12 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            PatternScreen(ragViewModel = ragViewModel, type = "Person")
-            /*
+            //PatternScreen(ragViewModel = ragViewModel, type = "Goal")
+
             if (!ragViewModel.isRAG.value)
                 MessagesList(chatViewModel = chatViewModel)
             else PatternsRAGScreen()
-             */
+
         }
     }
 

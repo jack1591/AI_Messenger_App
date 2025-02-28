@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimessengerapp.RAGRepositories.Goal
+import com.example.aimessengerapp.RAGRepositories.Location
 import com.example.aimessengerapp.RAGRepositories.Person
 import com.example.aimessengerapp.ViewModel.RAGViewModel
 import kotlinx.coroutines.flow.first
@@ -39,12 +41,18 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
     }
 
     val persons by ragViewModel.persons.collectAsState(emptyList())
+    val locations by ragViewModel.locations.collectAsState(emptyList())
+    val goals by ragViewModel.goals.collectAsState(emptyList())
+
     var showDialog by rememberSaveable{
         mutableStateOf(false)
     }
 
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
+
     var selectedPerson by remember { mutableStateOf<Person?>(null) }
+    var selectedLocation by remember { mutableStateOf<Location?>(null) }
+    var selectedGoal by remember { mutableStateOf<Goal?>(null) }
 
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -57,12 +65,35 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                items(persons) { person ->
-                    PatternObjectBubble(
-                        person = person,
-                        onUpdate = { selectedPerson = it; showUpdateDialog = true }, // ✅ Открываем `AlertDialog`
-                        onDelete = { ragViewModel.deletePerson(person) }
-                    )
+                if (type=="Person"){
+                    items(persons) { person ->
+                        PatternObjectBubble(
+                            person = person,
+                            type = "Person",
+                            onUpdate = { selectedPerson = person; ragViewModel.updatePerson(person); showUpdateDialog = true }, // ✅ Открываем `AlertDialog`
+                            onDelete = { ragViewModel.deletePerson(person) }
+                        )
+                    }
+                }
+                else if (type=="Location"){
+                    items(locations) { location ->
+                        PatternObjectBubble(
+                            location = location,
+                            type = "Location",
+                            onUpdate = { Log.i("location","update location ${location.name}"); selectedLocation = location; ragViewModel.updateLocation(location); showUpdateDialog = true }, // ✅ Открываем `AlertDialog`
+                            onDelete = { ragViewModel.deleteLocation(location) }
+                        )
+                    }
+                }
+                else {
+                    items(goals) { goal ->
+                        PatternObjectBubble(
+                            goal = goal,
+                            type = "Goal",
+                            onUpdate = { selectedGoal = goal; ragViewModel.updateGoal(goal); showUpdateDialog = true }, // ✅ Открываем `AlertDialog`
+                            onDelete = { ragViewModel.deleteGoal(goal) }
+                        )
+                    }
                 }
                 item {
                     Button(modifier = Modifier
@@ -78,26 +109,67 @@ fun PatternScreen(ragViewModel: RAGViewModel,type: String){
             }
         }
 
-    AddPersonDialog(
+    InsertDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
         onConfirm = { name ->
             if (name.isNotEmpty()) {
-                val personModel = Person(name = name)
-                ragViewModel.addPerson(personModel)
+                if (type=="Person") {
+                    val personModel = Person(name = name)
+                    ragViewModel.addPerson(personModel)
+                }
+                else if (type=="Location") {
+                    val locationModel = Location(name = name)
+                    ragViewModel.addLocation(locationModel)
+                }
+                else {
+                    val goalModel = Goal(name = name)
+                    ragViewModel.addGoal(goalModel)
+                }
             }
         })
 
-    ChangePersonDialog(
-        person = selectedPerson,
-        showDialog = showUpdateDialog,
-        onDismiss = { showUpdateDialog = false },
-        onConfirm = { newName ->
-            selectedPerson?.let {
-                Log.i("textState", newName)
-                val personModel = Person(id = it.id, name = newName)
-                ragViewModel.updatePerson(personModel)
-            }
-            showUpdateDialog = false
-        })
+    if (type=="Person") {
+        UpdateDialog(
+            person = selectedPerson,
+            showDialog = showUpdateDialog,
+            onDismiss = { showUpdateDialog = false },
+            onConfirm = { newName ->
+                selectedPerson?.let {
+                    Log.i("textState", newName)
+                    val personModel = Person(id = it.id, name = newName)
+                    ragViewModel.updatePerson(personModel)
+                }
+                showUpdateDialog = false
+            })
+    }
+    else if (type=="Location"){
+        Log.i("location","lets update")
+        UpdateDialog(
+            location = selectedLocation,
+            showDialog = showUpdateDialog,
+            onDismiss = { showUpdateDialog = false },
+            onConfirm = { newName ->
+                selectedLocation?.let {
+                    Log.i("textState", newName)
+                    val locationModel = Location(id = it.id, name = newName)
+                    ragViewModel.updateLocation(locationModel)
+                }
+                showUpdateDialog = false
+            })
+    }
+    else {
+        UpdateDialog(
+            goal = selectedGoal,
+            showDialog = showUpdateDialog,
+            onDismiss = { showUpdateDialog = false },
+            onConfirm = { newName ->
+                selectedGoal?.let {
+                    Log.i("textState", newName)
+                    val goalModel = Goal(id = it.id, name = newName)
+                    ragViewModel.updateGoal(goalModel)
+                }
+                showUpdateDialog = false
+            })
+    }
 }

@@ -26,16 +26,7 @@ class RAGViewModel (
     private val goalRepository: GoalRepository
 ): ViewModel() {
 
-    /*
-    private val _goals = MutableLiveData<List<Goal>>()
-    val goals: LiveData<List<Goal>> get() = _goals
 
-    private val _locations = MutableLiveData<List<Location>>()
-    val locations : LiveData<List<Location>> get() = _locations
-
-    private val _persons = MutableLiveData<List<Person>>()
-    val persons: LiveData<List<Person>> get() = _persons
-     */
     private val _persons = MutableStateFlow<List<Person>>(emptyList()) // ✅ Используем Flow
     val persons: StateFlow<List<Person>> = _persons
 
@@ -100,9 +91,33 @@ class RAGViewModel (
         }
     }
 
+    fun deleteLocation(location: Location){
+        viewModelScope.launch {
+            locationRepository.deleteLocation(location)
+        }
+    }
+
+    fun updateLocation(location: Location){
+        viewModelScope.launch {
+            locationRepository.updateLocation(location)
+        }
+    }
+
     fun addGoal(goal: Goal){
         viewModelScope.launch {
             goalRepository.addGoal(goal)
+        }
+    }
+
+    fun deleteGoal(goal: Goal){
+        viewModelScope.launch {
+            goalRepository.deleteGoal(goal)
+        }
+    }
+
+    fun updateGoal(goal: Goal){
+        viewModelScope.launch {
+            goalRepository.updateGoal(goal)
         }
     }
 

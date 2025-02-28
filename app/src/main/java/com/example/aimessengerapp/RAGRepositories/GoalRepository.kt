@@ -13,4 +13,16 @@ class GoalRepository(private val goalDao: GoalDao) {
             goalDao.insertGoal(goal)
         }
     }
+
+    suspend fun deleteGoal(goal: Goal){
+        withContext(Dispatchers.IO) {
+            goalDao.deleteGoal(goal)
+        }
+    }
+
+    suspend fun updateGoal(goal: Goal){
+        withContext(Dispatchers.IO) {
+            goalDao.updateGoal(goal)
+        }
+    }
 }
