@@ -19,14 +19,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.aimessengerapp.ViewModel.ChatViewModel
+import com.example.aimessengerapp.ChatModel.ChatObject
+import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.MessageViewModel
-import com.example.aimessengerapp.ViewModel.RAGViewModel
+import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 import com.example.aimessengerapp.api.NetworkResponse
 import com.example.aimessengerapp.api.RequestModel
 
 @Composable
-fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel){
+fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, numberOfChat: Int){
     val messageResult = viewModel.messageResult.observeAsState()
 
     Column(
@@ -66,7 +67,10 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
             IconButton(onClick = {
                 ragViewModel.changeRAG_byvalue(false)
                 if (viewModel.request.isNotEmpty()) {
+                    chatViewModel.insert(ChatObject(content = viewModel.request,type = "request", chatId = numberOfChat))
+
                     chatViewModel.addMessage(Pair(viewModel.request, true))
+
                     val requestModel = RequestModel(viewModel.request)
                     viewModel.getData(requestModel)
                     viewModel.request = ""
@@ -80,6 +84,7 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
         }
         when (val result = messageResult.value){
             is NetworkResponse.Success -> {
+                chatViewModel.insert(ChatObject(content = result.data.response.toString(),type = "response", chatId = numberOfChat))
                 chatViewModel.addMessage(Pair(result.data.response.toString(),false))
                 viewModel.clearResponse()
             }

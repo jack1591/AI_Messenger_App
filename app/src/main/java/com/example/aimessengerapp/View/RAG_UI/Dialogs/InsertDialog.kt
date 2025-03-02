@@ -5,7 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import com.example.aimessengerapp.ViewModel.RAGViewModel
+import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 @Composable
 fun InsertDialog(

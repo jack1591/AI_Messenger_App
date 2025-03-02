@@ -10,16 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.aimessengerapp.View.RAG_UI.PatternScreen
 import com.example.aimessengerapp.View.RAG_UI.PatternsRAGScreen
-import com.example.aimessengerapp.ViewModel.ChatViewModel
-import com.example.aimessengerapp.ViewModel.MessageViewModel
-import com.example.aimessengerapp.ViewModel.RAGViewModel
+import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
+import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 @Composable
-fun ScaffoldMain(padding: PaddingValues, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel){
+fun ScaffoldMain(padding: PaddingValues, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, numberOfChat: Int){
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = padding.calculateBottomPadding()),
+            .padding(bottom = padding.calculateBottomPadding(), top = padding.calculateTopPadding()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -29,7 +28,7 @@ fun ScaffoldMain(padding: PaddingValues, chatViewModel: ChatViewModel, ragViewMo
         }
         else {
             if (!ragViewModel.isRAG.value)
-                MessagesList(chatViewModel = chatViewModel)
+                MessagesList(chatViewModel = chatViewModel,numberOfChat)
             else PatternsRAGScreen(ragViewModel)
         }
     }

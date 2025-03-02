@@ -1,4 +1,4 @@
-package com.example.aimessengerapp.ViewModel
+package com.example.aimessengerapp.ViewModel.RAG
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -12,12 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.aimessengerapp.ViewModel.ChatViewModel
+import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 
 @Composable
-fun MessagesList(chatViewModel: ChatViewModel){
+fun MessagesList(chatViewModel: ChatViewModel, numberOfChat: Int){
     val listState = rememberLazyListState()
-
+    chatViewModel.getMessagesById(numberOfChat)
     Box(
         modifier = Modifier
             .padding(15.dp),

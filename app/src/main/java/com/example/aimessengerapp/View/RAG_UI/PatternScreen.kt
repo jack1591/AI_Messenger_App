@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.sp
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 import com.example.aimessengerapp.View.RAG_UI.Dialogs.InsertDialog
 import com.example.aimessengerapp.View.RAG_UI.Dialogs.UpdateDialog
-import com.example.aimessengerapp.ViewModel.RAGViewModel
+import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 
 @Composable
-fun PatternScreen(ragViewModel: RAGViewModel,type: String){
+fun PatternScreen(ragViewModel: RAGViewModel, type: String){
     var objectName by rememberSaveable{
         mutableStateOf("")
     }

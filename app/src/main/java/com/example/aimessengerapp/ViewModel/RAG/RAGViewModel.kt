@@ -1,15 +1,9 @@
-package com.example.aimessengerapp.ViewModel
+package com.example.aimessengerapp.ViewModel.RAG
 
 import android.util.Log
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 import com.example.aimessengerapp.RAGRepositories.RAGRepository
 import kotlinx.coroutines.Dispatchers

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.aimessengerapp.ViewModel.RAGViewModel
+import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 @Composable
 fun PatternsRAGScreen(
