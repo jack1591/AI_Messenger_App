@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 import com.example.aimessengerapp.View.RAG_UI.Dialogs.InsertDialog
 import com.example.aimessengerapp.View.RAG_UI.Dialogs.UpdateDialog
+import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 

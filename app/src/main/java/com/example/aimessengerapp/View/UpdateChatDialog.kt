@@ -1,4 +1,4 @@
-package com.example.aimessengerapp.View.RAG_UI.Dialogs
+package com.example.aimessengerapp.View
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -7,14 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.ViewModel
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
-import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
-
 
 @Composable
-fun UpdateDialog(
-    model: RAGViewModel,
+fun UpdateChatDialog(
+    model: ChatViewModel,
     name: String,
     showDialog: Boolean,
     onDismiss: () -> Unit,
@@ -54,4 +51,6 @@ fun UpdateDialog(
             }
         )
     }
+
+
 }
