@@ -67,13 +67,6 @@ class RAGViewModel (
         _dialogText.value = ""
     }
 
-    /*
-    var dialog_field by rememberSaveable {
-        mutableStateOf("")
-    }
-     */
-    //var showDialog by mutableStateOf(false)
-
     private var _patternName = mutableStateOf<String>("")
     val patternName = _patternName
 

@@ -1,12 +1,10 @@
-package com.example.aimessengerapp.View
+package com.example.aimessengerapp.View.RAG_UI.Dialogs
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.text.input.TextFieldValue
 import com.example.aimessengerapp.ViewModel.RAGViewModel
 
 @Composable
