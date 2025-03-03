@@ -1,5 +1,6 @@
 package com.example.aimessengerapp.View
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,9 @@ import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 @Composable
 fun MessagesList(chatViewModel: ChatViewModel, numberOfChat: Int){
     val listState = rememberLazyListState()
+    //Log.i("test5",numberOfChat.toString())
     chatViewModel.getMessagesById(numberOfChat)
+    //Log.i("test6",chatViewModel.messages.size.toString())
     Box(
         modifier = Modifier
             .padding(15.dp),

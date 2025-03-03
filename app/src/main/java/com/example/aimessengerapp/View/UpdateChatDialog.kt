@@ -7,19 +7,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.aimessengerapp.ChatNameModel.ChatEntity
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 
 @Composable
 fun UpdateChatDialog(
     model: ChatViewModel,
-    name: String,
+    entity: ChatEntity,
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ){
 
     val textState by model.dialogText.collectAsState()
-    model.updateDialogText(name)
+    model.updateDialogText(entity.name)
 
 
     if (showDialog){

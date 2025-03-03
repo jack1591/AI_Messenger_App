@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 
 class ChatEntityRepository(private val chatEntityDao: ChatEntityDao) {
 
+
     fun getAllChats(): Flow<List<ChatEntity>> {
         return chatEntityDao.getAllChats()
     }

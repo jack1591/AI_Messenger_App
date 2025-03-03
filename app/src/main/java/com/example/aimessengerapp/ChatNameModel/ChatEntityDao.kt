@@ -15,7 +15,7 @@ interface ChatEntityDao {
     @Update
     suspend fun updateChat(chat: ChatEntity)
 
-    @Query("SELECT * FROM chats ORDER BY indexAt DESC")
+    @Query("SELECT * FROM chats ORDER BY indexAt ASC")
     fun getAllChats(): Flow<List<ChatEntity>>
 
     @Query("SELECT * FROM chats ORDER BY clicks DESC")
