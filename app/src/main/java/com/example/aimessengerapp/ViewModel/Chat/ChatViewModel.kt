@@ -47,9 +47,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     private val _chats = mutableStateListOf<ChatEntity>()
     val chats: List<ChatEntity> = _chats
 
-    private val _selectedChat = MutableStateFlow<ChatEntity?>(null) // Храним текущий выбранный чат
-    val selectedChat: StateFlow<ChatEntity?> = _selectedChat
-
     private val _currentChatIndex = MutableStateFlow<Int?>(null) // Храним индекс текущего чата
     val currentChatIndex: StateFlow<Int?> = _currentChatIndex
 
@@ -60,7 +57,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             if (chatList.isEmpty()){
                 val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0)
                 insertChat(newChat)
-                _selectedChat.value = newChat
                 _currentChatIndex.value = 0
                 return@launch
             }
@@ -68,7 +64,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             val lastChat = chatList.last()
             val messages1 = chatRepository.getMessages(lastChat.indexAt).first()
             if (messages1.isEmpty()){
-                _selectedChat.value = lastChat
                 _currentChatIndex.value = lastChat.indexAt
             }
             else {
@@ -78,7 +73,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                     clicks = 0
                 )
                 insertChat(newChat)
-                _selectedChat.value = newChat
                 _currentChatIndex.value = newChat.indexAt
             }
         }

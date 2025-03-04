@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
 
         val messageViewModel = ViewModelProvider(this)[MessageViewModel::class.java]
 
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
