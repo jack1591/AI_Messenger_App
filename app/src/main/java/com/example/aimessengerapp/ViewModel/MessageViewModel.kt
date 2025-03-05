@@ -9,6 +9,8 @@ import com.example.aimessengerapp.api.NetworkResponse
 import com.example.aimessengerapp.api.RequestModel
 import com.example.aimessengerapp.api.ResponseModel
 import com.example.aimessengerapp.api.RetrofitInstance
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MessageViewModel : ViewModel() {
@@ -18,11 +20,7 @@ class MessageViewModel : ViewModel() {
     val messageResult : LiveData<NetworkResponse<ResponseModel>> = _messageResult
 
     var request by mutableStateOf("")
-    /*
-    fun changeMessage(text: String){
-        message = text
-    }
-     */
+
 
     fun getData(requestModel: RequestModel){
         _messageResult.value = NetworkResponse.Loading
@@ -48,4 +46,6 @@ class MessageViewModel : ViewModel() {
     fun clearResponse(){
         _messageResult.value = NetworkResponse.Waiting
     }
+
+
 }

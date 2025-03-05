@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +23,7 @@ import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 @Composable
-fun ScaffoldMain(padding: PaddingValues, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, numberOfChat: Int){
+fun ScaffoldMain(listState: LazyListState, padding: PaddingValues, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel){
 
 
     Column (
@@ -38,7 +39,7 @@ fun ScaffoldMain(padding: PaddingValues, chatViewModel: ChatViewModel, ragViewMo
         }
         else {
             if (!ragViewModel.isRAG.value)
-                MessagesList(chatViewModel = chatViewModel,numberOfChat)
+                MessagesList(listState, chatViewModel = chatViewModel)
             else PatternsRAGScreen(ragViewModel)
         }
     }

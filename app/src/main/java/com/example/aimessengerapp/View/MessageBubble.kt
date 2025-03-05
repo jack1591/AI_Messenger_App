@@ -11,14 +11,54 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun MessageBubble(
     message: String,
+    searchText: String,
     isUser: Boolean
 ){
+
+    var annotatedString: AnnotatedString = buildAnnotatedString {  }
+    if (searchText.isNotBlank()){
+        val lowerCaseMessage = message.lowercase()
+        val lowerCaseSearch = searchText.lowercase()
+
+        // Собираем AnnotatedString: обычный текст + подсвеченные совпадения
+        annotatedString = buildAnnotatedString {
+            var startIndex = 0
+            while (true) {
+                // Ищем следующее вхождение searchText в message
+                val index = lowerCaseMessage.indexOf(lowerCaseSearch, startIndex)
+                if (index == -1) {
+                    // Больше совпадений нет: добавить "хвост" обычным стилем
+                    append(message.substring(startIndex))
+                    break
+                } else {
+                    // Добавляем часть текста до совпадения
+                    append(message.substring(startIndex, index))
+                    // Подсвечиваем совпадение (желтым фоном и жирным шрифтом)
+                    withStyle(
+                        style = SpanStyle(
+                            background = Color.Yellow,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append(message.substring(index, index + searchText.length))
+                    }
+                    startIndex = index + searchText.length
+                }
+            }
+        }
+    }
+
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -31,7 +71,9 @@ fun MessageBubble(
                     .background(Color(0xFF6650a4), shape = RoundedCornerShape(12.dp))
                     .padding(15.dp)
             ) {
-                Text(text = message, fontSize = 16.sp, color = Color.White)
+                if (searchText.isBlank())
+                    Text(text = message, fontSize = 16.sp, color = Color.White)
+                else Text(text = annotatedString, fontSize = 16.sp)
             }
         }
         else {
@@ -40,7 +82,9 @@ fun MessageBubble(
                     .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
                     .padding(15.dp)
             ) {
-                Text(text = message, fontSize = 16.sp)
+                if (searchText.isBlank())
+                    Text(text = message, fontSize = 16.sp)
+                else Text(text = annotatedString, fontSize = 16.sp)
             }
         }
     }

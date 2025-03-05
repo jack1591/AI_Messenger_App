@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
@@ -13,14 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun MessagesList(chatViewModel: ChatViewModel, numberOfChat: Int){
-    val listState = rememberLazyListState()
-    //Log.i("test5",numberOfChat.toString())
-    chatViewModel.getMessagesById(numberOfChat)
-    //Log.i("test6",chatViewModel.messages.size.toString())
+fun MessagesList(listState: LazyListState, chatViewModel: ChatViewModel){
+
+    val searchText by chatViewModel.searchText.collectAsState()
+
     Box(
         modifier = Modifier
             .padding(15.dp),
@@ -34,7 +36,7 @@ fun MessagesList(chatViewModel: ChatViewModel, numberOfChat: Int){
             state = listState
         ) {
             items(chatViewModel.messages) { message ->
-                MessageBubble(message = message.first, message.second)
+                MessageBubble(message = message.first, searchText = searchText, message.second)
             }
         }
     }

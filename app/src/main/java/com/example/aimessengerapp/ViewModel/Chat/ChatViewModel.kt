@@ -12,11 +12,15 @@ import com.example.aimessengerapp.ChatNameModel.ChatEntityRepository
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 
 class ChatViewModel(private var chatRepository: ChatRepository, private val entityRepository: ChatEntityRepository): ViewModel() {
     private val _messages = mutableStateListOf<Pair<String,Boolean>>()
@@ -77,7 +81,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             }
         }
     }
-    //private var numberOfChat = 0
 
     init {
         load()
@@ -138,4 +141,35 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     fun clearDialogText() {
         _dialogText.value = ""
     }
+
+
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
+
+    fun onSearchTextChange(text: String){
+        _searchText.value = text
+    }
+
+    private val _savedListIndex = MutableStateFlow(0)
+    val savedListIndex = _savedListIndex.asStateFlow()
+
+    fun onSavedListIndexChange(index: Int){
+        _savedListIndex.value = index
+    }
+
+
+    private val _searchChat = MutableStateFlow("")
+    val searchChat = _searchChat.asStateFlow()
+
+    fun onSearchChatChange(text: String){
+        _searchChat.value = text
+    }
+
+    private val _savedListChatIndex = MutableStateFlow(0)
+    val savedListChatIndex = _savedListChatIndex.asStateFlow()
+
+    fun onSavedListChatIndexChange(index: Int){
+        _savedListChatIndex.value = index
+    }
+
 }
