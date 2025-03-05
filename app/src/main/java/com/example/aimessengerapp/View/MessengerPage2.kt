@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,9 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -101,10 +105,14 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                     ) {
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             TextField(
+                                modifier = Modifier.padding(start = 15.dp),
                                 value = searchChat,
                                 onValueChange = { newText ->
                                     chatViewModel.onSearchChatChange(newText)
@@ -125,8 +133,38 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             }) {
                                 Icon(imageVector = Icons.Default.Search, contentDescription = "search for message")
                             }
-                        }
 
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Сортировки")
+                            Row() {
+                                IconButton(onClick = {
+                                    chatViewModel.getAllChats()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "sort by date"
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    chatViewModel.getAllChatsByPopularity()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ThumbUp,
+                                        contentDescription = "sort by popularity"
+                                    )
+                                }
+                            }
+                        }
                         LazyColumn(
                             state = listChatState
                         ) {
@@ -146,8 +184,12 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                     },
                                     selected = index == selectedItemIndex,
                                     onClick = {
+                                        Log.i("clicks", chatViewModel.chats[index].clicks.toString())
                                         selectedItemIndex = index
                                         chatViewModel.getMessagesById(index)
+                                        chatViewModel.onSearchChatChange("")
+                                        chatViewModel.onSearchTextChange("")
+                                        chatViewModel.incrementChatClicks(selectedItemIndex)
                                         scope.launch {
                                             drawerState.close()
                                         }
@@ -229,9 +271,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
             showDialog = showUpdateDialog,
             onDismiss = { chatViewModel.clearDialogText(); showUpdateDialog = false },
             onConfirm = { newName ->
-                selectedEntity.name = newName
-                chatViewModel.updateChat(selectedEntity)
-                showUpdateDialog = false
+                if (newName.isNotEmpty()) {
+                    selectedEntity.name = newName
+                    chatViewModel.updateChat(selectedEntity)
+                    showUpdateDialog = false
+                }
             })
 
     }

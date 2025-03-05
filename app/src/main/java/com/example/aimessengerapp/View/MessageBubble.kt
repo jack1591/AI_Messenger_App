@@ -31,20 +31,15 @@ fun MessageBubble(
         val lowerCaseMessage = message.lowercase()
         val lowerCaseSearch = searchText.lowercase()
 
-        // Собираем AnnotatedString: обычный текст + подсвеченные совпадения
         annotatedString = buildAnnotatedString {
             var startIndex = 0
             while (true) {
-                // Ищем следующее вхождение searchText в message
                 val index = lowerCaseMessage.indexOf(lowerCaseSearch, startIndex)
                 if (index == -1) {
-                    // Больше совпадений нет: добавить "хвост" обычным стилем
                     append(message.substring(startIndex))
                     break
                 } else {
-                    // Добавляем часть текста до совпадения
                     append(message.substring(startIndex, index))
-                    // Подсвечиваем совпадение (желтым фоном и жирным шрифтом)
                     withStyle(
                         style = SpanStyle(
                             background = Color.Yellow,

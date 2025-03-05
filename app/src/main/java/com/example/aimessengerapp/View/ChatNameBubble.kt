@@ -67,21 +67,23 @@ fun ChatNameBubble(
         if (searchChat.isBlank())
             Text(text = name)
         else Text(text = annotatedString)
-        IconButton(onClick = {
-            onClick()
-        }) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "edit name of chat"
-            )
-        }
-        IconButton(onClick = {
-            onDelete()
-        }) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "delete chat"
-            )
+        Row() {
+            IconButton(onClick = {
+                onClick()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "edit name of chat"
+                )
+            }
+            IconButton(onClick = {
+                onDelete()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "delete chat"
+                )
+            }
         }
     }
 }
