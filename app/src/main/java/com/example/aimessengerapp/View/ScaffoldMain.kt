@@ -25,7 +25,6 @@ import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 @Composable
 fun ScaffoldMain(listState: LazyListState, padding: PaddingValues, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel){
 
-
     Column (
         modifier = Modifier
             .fillMaxSize()

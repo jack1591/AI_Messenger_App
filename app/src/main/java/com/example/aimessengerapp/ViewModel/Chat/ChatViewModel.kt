@@ -3,6 +3,7 @@ package com.example.aimessengerapp.ViewModel.Chat
 import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimessengerapp.ChatModel.ChatObject
@@ -56,7 +57,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
 
     fun determineChatToSelect(){
         viewModelScope.launch {
-            val chatList = entityRepository.getAllChats().first()
+            val chatList = entityRepository.getAllChats().first()//.sortedBy { it.id }
 
             if (chatList.isEmpty()){
                 val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0)
@@ -66,6 +67,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             }
 
             val lastChat = chatList.last()
+            Log.i("number of last chat", lastChat.name+" "+lastChat.indexAt.toString())
             val messages1 = chatRepository.getMessages(lastChat.indexAt).first()
             if (messages1.isEmpty()){
                 _currentChatIndex.value = lastChat.indexAt
@@ -82,6 +84,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         }
     }
 
+
     init {
         load()
     }
@@ -90,6 +93,10 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         getAllChats()
     }
 
+
+    private val _numberOfSort = mutableStateOf(0)
+    val numberOfSort = _numberOfSort
+
     fun getAllChats(){
         viewModelScope.launch {
             entityRepository.getAllChats().collectLatest { list ->
@@ -97,6 +104,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                 list.forEach { chatName ->
                     _chats.add(chatName)
                 }
+                _numberOfSort.value = 1
             }
         }
     }
@@ -108,6 +116,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                 list.forEach { chatName ->
                     _chats.add(chatName)
                 }
+                _numberOfSort.value = 2
             }
         }
     }
@@ -171,5 +180,6 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     fun onSavedListChatIndexChange(index: Int){
         _savedListChatIndex.value = index
     }
+
 
 }

@@ -60,9 +60,13 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    /*
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
+     */
+
+    var selectedChatId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     var selectedEntity by remember{
         mutableStateOf(ChatEntity(name = "",indexAt = -1,clicks = 0))
@@ -96,7 +100,8 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     if (currentChatIndex==null)
         LoadingScreen()
     else {
-        selectedItemIndex = currentChatIndex as Int
+        //selectedItemIndex = currentChatIndex as Int
+        selectedChatId = currentChatIndex
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet {
@@ -144,7 +149,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Сортировки")
+                            if (chatViewModel.numberOfSort.value == 1)
+                                Text(text = "Сортировка по дате")
+                            else if (chatViewModel.numberOfSort.value == 2)
+                                Text(text = "Сортировка по популярности")
+
                             Row() {
                                 IconButton(onClick = {
                                     chatViewModel.getAllChats()
@@ -182,14 +191,17 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
 
                                             })
                                     },
-                                    selected = index == selectedItemIndex,
+                                    selected = item.indexAt == selectedChatId,//index == selectedItemIndex,
                                     onClick = {
                                         Log.i("clicks", chatViewModel.chats[index].clicks.toString())
-                                        selectedItemIndex = index
-                                        chatViewModel.getMessagesById(index)
+                                        //selectedItemIndex = index
+                                        selectedChatId = item.indexAt
+                                        chatViewModel.getMessagesById(item.indexAt)
+                                        //chatViewModel.getMessagesById(chatViewModel.chats[selectedItemIndex].indexAt)
                                         chatViewModel.onSearchChatChange("")
                                         chatViewModel.onSearchTextChange("")
-                                        chatViewModel.incrementChatClicks(selectedItemIndex)
+                                        //chatViewModel.incrementChatClicks(selectedItemIndex)
+                                        chatViewModel.incrementChatClicks(selectedChatId ?:0)
                                         scope.launch {
                                             drawerState.close()
                                         }
@@ -250,7 +262,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             .fillMaxWidth()
                             .heightIn(min = 150.dp)
                     ) {
-                        BottomBar(viewModel, chatViewModel, ragViewModel, selectedItemIndex)
+                        BottomBar(viewModel, chatViewModel, ragViewModel, selectedChatId ?:0)
                     }
 
                 }
