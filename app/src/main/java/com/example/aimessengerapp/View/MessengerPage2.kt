@@ -189,7 +189,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                     },
                                     selected = item.indexAt == selectedChatId,
                                     onClick = {
-                                        Log.i("clicks", chatViewModel.chats[index].clicks.toString())
                                         selectedChatId = item.indexAt
                                         chatViewModel.getMessagesById(item.indexAt)
                                         chatViewModel.onSearchChatChange("")
