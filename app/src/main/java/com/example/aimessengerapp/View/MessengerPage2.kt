@@ -60,12 +60,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    /*
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
-     */
-
     var selectedChatId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     var selectedEntity by remember{
@@ -188,19 +182,18 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                                 showUpdateDialog = true
                                             },
                                             onDelete = {
-
+                                                if (item.indexAt!=selectedChatId){
+                                                    chatViewModel.deleteChat(item)
+                                                }
                                             })
                                     },
-                                    selected = item.indexAt == selectedChatId,//index == selectedItemIndex,
+                                    selected = item.indexAt == selectedChatId,
                                     onClick = {
                                         Log.i("clicks", chatViewModel.chats[index].clicks.toString())
-                                        //selectedItemIndex = index
                                         selectedChatId = item.indexAt
                                         chatViewModel.getMessagesById(item.indexAt)
-                                        //chatViewModel.getMessagesById(chatViewModel.chats[selectedItemIndex].indexAt)
                                         chatViewModel.onSearchChatChange("")
                                         chatViewModel.onSearchTextChange("")
-                                        //chatViewModel.incrementChatClicks(selectedItemIndex)
                                         chatViewModel.incrementChatClicks(selectedChatId ?:0)
                                         scope.launch {
                                             drawerState.close()

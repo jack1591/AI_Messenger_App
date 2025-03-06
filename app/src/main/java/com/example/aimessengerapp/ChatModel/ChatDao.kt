@@ -13,6 +13,9 @@ interface ChatDao {
     @Query("SELECT * FROM messages WHERE chatId = :chatId ORDER BY id ASC")
     fun getMessagesByChatId(chatId: Int): Flow<List<ChatObject>>
 
+    @Query("DELETE FROM messages WHERE chatId = :chatId")
+    suspend fun deleteMessagesByChatId(chatId: Int)
+
     @Insert
     suspend fun insertMessage(message: ChatObject)
 

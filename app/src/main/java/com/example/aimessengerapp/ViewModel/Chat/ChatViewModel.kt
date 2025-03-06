@@ -57,7 +57,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
 
     fun determineChatToSelect(){
         viewModelScope.launch {
-            val chatList = entityRepository.getAllChats().first()//.sortedBy { it.id }
+            val chatList = entityRepository.getAllChats().first().sortedBy { it.indexAt}
 
             if (chatList.isEmpty()){
                 val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0)
@@ -66,7 +66,9 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                 return@launch
             }
 
-            val lastChat = chatList.last()
+            var lastChat = chatList.last()
+
+
             Log.i("number of last chat", lastChat.name+" "+lastChat.indexAt.toString())
             val messages1 = chatRepository.getMessages(lastChat.indexAt).first()
             if (messages1.isEmpty()){
@@ -74,8 +76,8 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             }
             else {
                 val newChat = ChatEntity(
-                    name = "Новый чат ${chatList.size}",
-                    indexAt = chatList.size,
+                    name = "Новый чат ${lastChat.indexAt+1}",
+                    indexAt = lastChat.indexAt+1,
                     clicks = 0
                 )
                 insertChat(newChat)
@@ -132,6 +134,22 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             entityRepository.updateChat(chatEntity)
         }
     }
+
+    fun deleteChat(chat: ChatEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.i("chatDelete", chat.indexAt.toString())
+            chatRepository.deleteMessages(chat.indexAt)
+            entityRepository.deleteChat(chat)
+        }
+    }
+
+    /*
+    fun deleteMessagesById(index: Int) {
+        viewModelScope.launch {
+            chatRepository.deleteMessages(index)
+        }
+    }
+     */
 
     fun incrementChatClicks(chatId: Int) {
         viewModelScope.launch {

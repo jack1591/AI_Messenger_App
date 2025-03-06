@@ -11,6 +11,12 @@ class ChatRepository(private val chatDao: ChatDao) {
         return chatDao.getMessagesByChatId(chatId)
     }
 
+    suspend fun deleteMessages(chatId: Int) {
+        withContext(Dispatchers.IO) {
+            chatDao.deleteMessagesByChatId(chatId)
+        }
+    }
+
     suspend fun insert(message: ChatObject){
         withContext(Dispatchers.IO) {
             chatDao.insertMessage(message)

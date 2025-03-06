@@ -28,6 +28,12 @@ class ChatEntityRepository(private val chatEntityDao: ChatEntityDao) {
         }
     }
 
+    suspend fun deleteChat(chat: ChatEntity){
+        withContext(Dispatchers.IO) {
+            chatEntityDao.deleteChat(chat)
+        }
+    }
+
     suspend fun incrementChatClicks(chatId: Int) {
         chatEntityDao.incrementClick(chatId)
     }
