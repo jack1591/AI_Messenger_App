@@ -26,4 +26,5 @@ class RAGRepository(private val ragDao: RAGDao) {
             ragDao.update(ragObject)
         }
     }
+
 }

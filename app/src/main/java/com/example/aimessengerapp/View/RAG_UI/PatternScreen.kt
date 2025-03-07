@@ -29,7 +29,7 @@ import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
 
 @Composable
-fun PatternScreen(ragViewModel: RAGViewModel, type: String){
+fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
     var objectName by rememberSaveable{
         mutableStateOf("")
     }
@@ -43,7 +43,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String){
 
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
 
-    var selectedObject by remember { mutableStateOf<RAGObject?>(RAGObject(name = "", type = "default")) }
+    var selectedObject by remember { mutableStateOf<RAGObject?>(RAGObject(name = "", type = "default", isFavorite = false)) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -57,29 +57,37 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String){
             verticalArrangement = Arrangement.Center,
         ) {
             items(ragObjects) { ragObject ->
-                if (type==ragObject.type) {
+                if (type==ragObject.type && (typeOfChat=="ALL" || (typeOfChat=="FAVORITE" && ragObject.isFavorite))) {
                     PatternObjectBubble(
                         ragObject = ragObject,
+                        //ragViewModel = ragViewModel,
                         onUpdate = {
                             selectedObject =
                                 ragObject; ragViewModel.update(ragObject); showUpdateDialog = true
                         },
                         onDelete = { ragViewModel.delete(ragObject) },
-                        onInsert = {ragViewModel.chooseNameToInsert(Pair(ragObject.name,type))}
+                        onInsert = {ragViewModel.chooseNameToInsert(Pair(ragObject.name,type))},
+                        onSelect = {
+
+                            val objectModel = ragObject.copy(isFavorite = !ragObject.isFavorite)
+                            ragViewModel.update(objectModel)
+                        }
                     )
                 }
             }
 
-            item {
-                Button(modifier = Modifier
-                    .padding(5.dp),
-                    onClick = {
-                        showDialog = true
+            if (typeOfChat == "ALL") {
+                item {
+                    Button(modifier = Modifier
+                        .padding(5.dp),
+                        onClick = {
+                            showDialog = true
+                        }
+                    ) {
+                        Text(text = "ADD", fontSize = 10.sp)
                     }
-                ) {
-                    Text(text = "ADD", fontSize = 10.sp)
-                }
 
+                }
             }
         }
     }
@@ -90,7 +98,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String){
         onDismiss = { ragViewModel.clearDialogText(); showDialog = false },
         onConfirm = { name ->
             if (name.isNotEmpty()) {
-                val objectModel = RAGObject(name = name, type = type)
+                val objectModel = RAGObject(name = name, type = type, isFavorite = false)
                 ragViewModel.insert(objectModel)
             }
         })
@@ -104,7 +112,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String){
             onConfirm = { newName ->
                 selectedObject?.let {
                     Log.i("textState", newName)
-                    val objectModel = RAGObject(id = it.id, name = newName, type = type)
+                    val objectModel = RAGObject(id = it.id, name = newName, type = type, isFavorite = it.isFavorite)
                     ragViewModel.update(objectModel)
                 }
                 showUpdateDialog = false

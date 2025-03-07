@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.aimessengerapp.RAGRepositories.RAGObject
+import com.example.aimessengerapp.View.RAG_UI.ChooseFavoriteScreen
 import com.example.aimessengerapp.View.RAG_UI.Dialogs.UpdateDialog
 import com.example.aimessengerapp.View.RAG_UI.PatternScreen
 import com.example.aimessengerapp.View.RAG_UI.PatternsRAGScreen
@@ -32,15 +33,33 @@ fun ScaffoldMain(listState: LazyListState, padding: PaddingValues, chatViewModel
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-
-        if (ragViewModel.patternName.value!=""){
-            PatternScreen(ragViewModel = ragViewModel, type = ragViewModel.patternName.value)
-        }
+        if (ragViewModel.ragChat.value!="")
+            PatternScreen(ragViewModel = ragViewModel, type = ragViewModel.patternName.value, typeOfChat = ragViewModel.ragChat.value)
         else {
-            if (!ragViewModel.isRAG.value)
-                MessagesList(listState, chatViewModel = chatViewModel)
-            else PatternsRAGScreen(ragViewModel)
+            if (ragViewModel.patternName.value != "") {
+                ChooseFavoriteScreen(
+                    onAll = { ragViewModel.chooseAll() },
+                    onFavorite = { ragViewModel.chooseFavorite() }
+                )
+            } else {
+                if (!ragViewModel.isRAG.value)
+                    MessagesList(listState, chatViewModel = chatViewModel)
+                else PatternsRAGScreen(ragViewModel)
+            }
         }
+            /*
+            if (ragViewModel.ragChat.value != "")
+                PatternsRAGScreen(ragViewModel)
+            else {
+                if (!ragViewModel.isRAG.value)
+                    MessagesList(listState, chatViewModel = chatViewModel)
+                else ChooseFavoriteScreen(
+                    onAll = { ragViewModel.chooseAll() },
+                    onFavorite = { ragViewModel.chooseFavorite() }
+                )
+            }
+             */
+
     }
 
 }

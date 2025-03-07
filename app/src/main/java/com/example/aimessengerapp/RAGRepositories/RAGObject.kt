@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class RAGObject(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val type : String,
-    val name: String
+    val name: String,
+    val isFavorite: Boolean
 )

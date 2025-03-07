@@ -77,7 +77,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         initialFirstVisibleItemIndex = listIndex
     )
 
-
     val searchChat by chatViewModel.searchChat.collectAsState()
     val listChatIndex by chatViewModel.savedListChatIndex.collectAsState()
 
@@ -85,16 +84,13 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         initialFirstVisibleItemIndex = listChatIndex
     )
 
-
     LaunchedEffect(Unit) {
         chatViewModel.determineChatToSelect()
     }
 
-
     if (currentChatIndex==null)
         LoadingScreen()
     else {
-        //selectedItemIndex = currentChatIndex as Int
         selectedChatId = currentChatIndex
         ModalNavigationDrawer(
             drawerContent = {
@@ -128,7 +124,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                         listChatState.animateScrollToItem(foundChatIndex)
                                     }
                                 }
-
                             }) {
                                 Icon(imageVector = Icons.Default.Search, contentDescription = "search for message")
                             }

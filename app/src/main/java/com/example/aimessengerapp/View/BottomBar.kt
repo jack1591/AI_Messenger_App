@@ -59,6 +59,7 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                 .padding(5.dp),
                 onClick = {
                     ragViewModel.changeRAG()
+                    ragViewModel.clearChat()
                 }
             ) {
                 Text(text = "RAG", fontSize = 10.sp)
@@ -66,6 +67,7 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
 
             IconButton(onClick = {
                 ragViewModel.changeRAG_byvalue(false)
+                ragViewModel.clearChat()
                 if (viewModel.request.isNotEmpty()) {
                     chatViewModel.insert(ChatObject(content = viewModel.request,type = "request", chatId = numberOfChat))
 

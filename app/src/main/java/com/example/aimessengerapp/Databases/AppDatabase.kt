@@ -10,20 +10,25 @@ import com.example.aimessengerapp.RAGRepositories.RAGDao
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 
 
-private val MIGRATION_1_2 = object : Migration(1, 2) {
+private val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "CREATE TABLE ragObjects (" +
+            "CREATE TABLE ragObjects_new (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "name TEXT NOT NULL, " +
-                    "type TEXT NOT NULL)"
+                    "type TEXT NOT NULL, " +
+                    "isFavorite INTEGER NOT NULL DEFAULT 0)"
         )
+
         // Удаляем старую таблицу
-        database.execSQL("DROP TABLE jetpack")
+        database.execSQL("DROP TABLE ragObjects")
+
+        // Переименовываем новую таблицу
+        database.execSQL("ALTER TABLE ragObjects_new RENAME TO ragObjects")
     }
 }
 
-@Database(entities = [RAGObject::class],version = 2, exportSchema = false)
+@Database(entities = [RAGObject::class],version = 3, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun ragDao(): RAGDao
 
@@ -39,7 +44,7 @@ abstract class AppDatabase: RoomDatabase() {
             synchronized(this) {
                 val instance = Room.databaseBuilder(context.applicationContext,
                     AppDatabase::class.java, "ragObjects")
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 return instance

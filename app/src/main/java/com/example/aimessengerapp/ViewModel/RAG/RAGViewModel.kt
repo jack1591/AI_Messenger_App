@@ -100,4 +100,19 @@ class RAGViewModel (
         _isRAG.value = _value
         choosePatternName("")
     }
+
+    private var _ragChat = mutableStateOf<String>("")
+    val ragChat = _ragChat
+
+    fun chooseAll(){
+        _ragChat.value = "ALL"
+    }
+
+    fun chooseFavorite(){
+        _ragChat.value = "FAVORITE"
+    }
+
+    fun clearChat(){
+        _ragChat.value = ""
+    }
 }
