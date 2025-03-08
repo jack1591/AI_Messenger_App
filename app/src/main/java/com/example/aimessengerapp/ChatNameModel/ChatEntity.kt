@@ -8,5 +8,6 @@ data class ChatEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var name: String,
     val indexAt : Int,
-    val clicks: Int = 0
+    val clicks: Int = 0,
+    val isFavorite: Boolean
 )

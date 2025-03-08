@@ -60,7 +60,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
             val chatList = entityRepository.getAllChats().first().sortedBy { it.indexAt}
 
             if (chatList.isEmpty()){
-                val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0)
+                val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0, isFavorite = false)
                 insertChat(newChat)
                 _currentChatIndex.value = 0
                 return@launch
@@ -78,7 +78,8 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                 val newChat = ChatEntity(
                     name = "Новый чат ${lastChat.indexAt+1}",
                     indexAt = lastChat.indexAt+1,
-                    clicks = 0
+                    clicks = 0,
+                    isFavorite = false
                 )
                 insertChat(newChat)
                 _currentChatIndex.value = newChat.indexAt

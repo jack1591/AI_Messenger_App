@@ -1,7 +1,16 @@
 package com.example.aimessengerapp.View
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,10 +27,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
@@ -43,6 +55,7 @@ import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.Navigation
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
@@ -63,7 +76,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     var selectedChatId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     var selectedEntity by remember{
-        mutableStateOf(ChatEntity(name = "",indexAt = -1,clicks = 0))
+        mutableStateOf(ChatEntity(name = "",indexAt = -1,clicks = 0, isFavorite = false))
     }
 
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
@@ -84,6 +97,10 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         initialFirstVisibleItemIndex = listChatIndex
     )
 
+    var isVisible by remember{
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(Unit) {
         chatViewModel.determineChatToSelect()
     }
@@ -97,7 +114,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                 ModalDrawerSheet {
                     Column(
                         modifier = Modifier.fillMaxSize()
-                    ) {
+                    )  {
 
                         Row(
                             modifier = Modifier
@@ -163,6 +180,81 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Column(
+                        ){
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ){
+                                IconButton(onClick = { isVisible = !isVisible }) {
+                                    if (!isVisible)
+                                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "open list")
+                                    else
+                                        Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "close list")
+                                }
+
+                                if (!isVisible)
+                                    Text(text = "Открыть список")
+                                else Text(text = "Закрыть список")
+                            }
+
+                            AnimatedVisibility(
+                                visible = isVisible,
+                                enter = slideInVertically() + fadeIn(),
+                                exit = slideOutVertically() + fadeOut(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                LazyColumn(
+                                    state = listChatState
+                                ) {
+                                    itemsIndexed(chatViewModel.chats) { index, item ->
+                                        if (item.isFavorite) {
+                                            NavigationDrawerItem(
+                                                label = {
+                                                    ChatNameBubble(
+                                                        chat = item,
+                                                        searchChat = searchChat,
+                                                        onClick = {
+                                                            selectedEntity = item
+                                                            showUpdateDialog = true
+                                                        },
+                                                        onDelete = {
+                                                            if (item.indexAt != selectedChatId) {
+                                                                chatViewModel.deleteChat(item)
+                                                            }
+                                                        },
+                                                        onChooseFavorite = {
+                                                            val chatModel = item.copy(isFavorite = !item.isFavorite)
+                                                            chatViewModel.updateChat(chatModel)
+                                                            Log.i("chatFavorite", chatViewModel.chats[index].isFavorite.toString())
+                                                        })
+                                                },
+                                                selected = item.indexAt == selectedChatId,
+                                                onClick = {
+                                                    selectedChatId = item.indexAt
+                                                    chatViewModel.getMessagesById(item.indexAt)
+                                                    chatViewModel.onSearchChatChange("")
+                                                    chatViewModel.onSearchTextChange("")
+                                                    chatViewModel.incrementChatClicks(
+                                                        selectedChatId ?: 0
+                                                    )
+                                                    scope.launch {
+                                                        drawerState.close()
+                                                    }
+                                                })
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
                         LazyColumn(
                             state = listChatState
                         ) {
@@ -170,7 +262,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                 NavigationDrawerItem(
                                     label = {
                                         ChatNameBubble(
-                                            name = item.name,
+                                            chat = item,
                                             searchChat = searchChat,
                                             onClick = {
                                                 selectedEntity = item
@@ -180,6 +272,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                                 if (item.indexAt!=selectedChatId){
                                                     chatViewModel.deleteChat(item)
                                                 }
+                                            },
+                                            onChooseFavorite = {
+                                                val chatModel = item.copy(isFavorite = !item.isFavorite)
+                                                chatViewModel.updateChat(chatModel)
+                                                Log.i("chatFavoriteAll", chatViewModel.chats[index].isFavorite.toString())
                                             })
                                     },
                                     selected = item.indexAt == selectedChatId,
@@ -201,6 +298,8 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
             },
             drawerState = drawerState
         )
+
+
         {
             Scaffold(
                 topBar = {
