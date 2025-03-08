@@ -31,8 +31,19 @@ import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModelFactory
 import java.util.concurrent.TimeUnit
 import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 class MainActivity : ComponentActivity() {
+
+    val voiceToTextParser by lazy{
+        VoiceToTextParser(application)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -64,7 +75,22 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            MessengerPage2(messageViewModel,chatViewModel, ragViewModel)
+            var canRecord by remember{
+                mutableStateOf(false)
+            }
+
+            var recordAudioLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = { isGranted ->
+                    canRecord = isGranted
+                }
+            )
+            
+            LaunchedEffect(key1 = recordAudioLauncher) {
+                recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+
+            MessengerPage2(messageViewModel,chatViewModel, ragViewModel, voiceToTextParser)
         }
     }
 }

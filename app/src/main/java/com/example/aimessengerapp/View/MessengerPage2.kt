@@ -42,11 +42,12 @@ import com.example.aimessengerapp.ChatNameModel.ChatEntity
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.MessageViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
+import com.example.aimessengerapp.VoiceToTextParser
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel) {
+fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, voiceToTextParser: VoiceToTextParser) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -281,7 +282,13 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             .fillMaxWidth()
                             .heightIn(min = 150.dp)
                     ) {
-                        BottomBar(viewModel, chatViewModel, ragViewModel, currentChatIndex ?:0)
+                        BottomBar(
+                            viewModel,
+                            chatViewModel,
+                            ragViewModel,
+                            currentChatIndex ?:0,
+                            voiceToTextParser
+                        )
                     }
 
                 }

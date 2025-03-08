@@ -80,4 +80,6 @@ dependencies {
 
     val work_version = "2.7.0"
     implementation("androidx.work:work-runtime-ktx:$work_version")
+
+    implementation("androidx.compose.material:material-icons-extended:1.3.1")
 }
