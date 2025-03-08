@@ -1,16 +1,7 @@
 package com.example.aimessengerapp.View
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,22 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,28 +27,22 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.Navigation
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
-import com.example.aimessengerapp.RAGRepositories.RAGObject
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.MessageViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,8 +50,6 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-    var selectedChatId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     var selectedEntity by remember{
         mutableStateOf(ChatEntity(name = "",indexAt = -1,clicks = 0, isFavorite = false))
@@ -97,18 +73,16 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         initialFirstVisibleItemIndex = listChatIndex
     )
 
-    var isVisible by remember{
-        mutableStateOf(false)
-    }
+    val isFavorite by chatViewModel.isFavorite.collectAsState()
 
     LaunchedEffect(Unit) {
-        chatViewModel.determineChatToSelect()
+        if (chatViewModel.currentChatIndex.value == null)
+            chatViewModel.determineChatToSelect()
     }
 
     if (currentChatIndex==null)
         LoadingScreen()
     else {
-        selectedChatId = currentChatIndex
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet {
@@ -123,7 +97,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            TextField(
+                            OutlinedTextField(
                                 modifier = Modifier.padding(start = 15.dp),
                                 value = searchChat,
                                 onValueChange = { newText ->
@@ -146,6 +120,30 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             }
 
                         }
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (!isFavorite)
+                                Text(text = "Все чаты")
+                            else
+                                Text(text = "Избранные чаты")
+
+                            IconButton(onClick = {
+                                chatViewModel.changeList()
+                            }) {
+                                Icon(imageVector = Icons.Default.Star,
+                                    tint = if (isFavorite) Color(0xFFB07D2B) else Color.Gray,
+                                    contentDescription = "add to chosen")
+                            }
+
+                        }
+
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Row(
@@ -183,114 +181,47 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        Column(
-                        ){
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ){
-                                IconButton(onClick = { isVisible = !isVisible }) {
-                                    if (!isVisible)
-                                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "open list")
-                                    else
-                                        Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "close list")
-                                }
-
-                                if (!isVisible)
-                                    Text(text = "Открыть список")
-                                else Text(text = "Закрыть список")
-                            }
-
-                            AnimatedVisibility(
-                                visible = isVisible,
-                                enter = slideInVertically() + fadeIn(),
-                                exit = slideOutVertically() + fadeOut(),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                LazyColumn(
-                                    state = listChatState
-                                ) {
-                                    itemsIndexed(chatViewModel.chats) { index, item ->
-                                        if (item.isFavorite) {
-                                            NavigationDrawerItem(
-                                                label = {
-                                                    ChatNameBubble(
-                                                        chat = item,
-                                                        searchChat = searchChat,
-                                                        onClick = {
-                                                            selectedEntity = item
-                                                            showUpdateDialog = true
-                                                        },
-                                                        onDelete = {
-                                                            if (item.indexAt != selectedChatId) {
-                                                                chatViewModel.deleteChat(item)
-                                                            }
-                                                        },
-                                                        onChooseFavorite = {
-                                                            val chatModel = item.copy(isFavorite = !item.isFavorite)
-                                                            chatViewModel.updateChat(chatModel)
-                                                            Log.i("chatFavorite", chatViewModel.chats[index].isFavorite.toString())
-                                                        })
-                                                },
-                                                selected = item.indexAt == selectedChatId,
-                                                onClick = {
-                                                    selectedChatId = item.indexAt
-                                                    chatViewModel.getMessagesById(item.indexAt)
-                                                    chatViewModel.onSearchChatChange("")
-                                                    chatViewModel.onSearchTextChange("")
-                                                    chatViewModel.incrementChatClicks(
-                                                        selectedChatId ?: 0
-                                                    )
-                                                    scope.launch {
-                                                        drawerState.close()
-                                                    }
-                                                })
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
                         LazyColumn(
                             state = listChatState
                         ) {
                             itemsIndexed(chatViewModel.chats) { index, item ->
-                                NavigationDrawerItem(
-                                    label = {
-                                        ChatNameBubble(
-                                            chat = item,
-                                            searchChat = searchChat,
-                                            onClick = {
-                                                selectedEntity = item
-                                                showUpdateDialog = true
-                                            },
-                                            onDelete = {
-                                                if (item.indexAt!=selectedChatId){
-                                                    chatViewModel.deleteChat(item)
-                                                }
-                                            },
-                                            onChooseFavorite = {
-                                                val chatModel = item.copy(isFavorite = !item.isFavorite)
-                                                chatViewModel.updateChat(chatModel)
-                                                Log.i("chatFavoriteAll", chatViewModel.chats[index].isFavorite.toString())
-                                            })
-                                    },
-                                    selected = item.indexAt == selectedChatId,
-                                    onClick = {
-                                        selectedChatId = item.indexAt
-                                        chatViewModel.getMessagesById(item.indexAt)
-                                        chatViewModel.onSearchChatChange("")
-                                        chatViewModel.onSearchTextChange("")
-                                        chatViewModel.incrementChatClicks(selectedChatId ?:0)
-                                        scope.launch {
-                                            drawerState.close()
-                                        }
-                                    })
-
+                                if ((isFavorite && item.isFavorite) || (!isFavorite)) {
+                                    NavigationDrawerItem(
+                                        label = {
+                                            ChatNameBubble(
+                                                chat = item,
+                                                searchChat = searchChat,
+                                                onClick = {
+                                                    selectedEntity = item
+                                                    showUpdateDialog = true
+                                                },
+                                                onDelete = {
+                                                    if (item.indexAt != currentChatIndex) {
+                                                        chatViewModel.deleteChat(item)
+                                                    }
+                                                },
+                                                onChooseFavorite = {
+                                                    val chatModel =
+                                                        item.copy(isFavorite = !item.isFavorite)
+                                                    chatViewModel.updateChat(chatModel)
+                                                    Log.i(
+                                                        "chatFavoriteAll",
+                                                        chatViewModel.chats[index].isFavorite.toString()
+                                                    )
+                                                })
+                                        },
+                                        selected = item.indexAt == currentChatIndex,
+                                        onClick = {
+                                            chatViewModel.selectChat(item.indexAt)
+                                            chatViewModel.getMessagesById(item.indexAt)
+                                            chatViewModel.onSearchChatChange("")
+                                            chatViewModel.onSearchTextChange("")
+                                            chatViewModel.incrementChatClicks(currentChatIndex ?: 0)
+                                            scope.launch {
+                                                drawerState.close()
+                                            }
+                                        })
+                                }
                             }
                         }
                     }
@@ -306,9 +237,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                     TopAppBar(
                         title = {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceAround
                             ) {
-                                TextField(
+                                OutlinedTextField(
+                                    modifier = Modifier.weight(2f),
                                     value = searchText,
                                     onValueChange = { newText ->
                                         chatViewModel.onSearchTextChange(newText)
@@ -348,7 +281,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             .fillMaxWidth()
                             .heightIn(min = 150.dp)
                     ) {
-                        BottomBar(viewModel, chatViewModel, ragViewModel, selectedChatId ?:0)
+                        BottomBar(viewModel, chatViewModel, ragViewModel, currentChatIndex ?:0)
                     }
 
                 }

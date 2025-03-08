@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -90,7 +91,7 @@ fun ChatNameBubble(
                 onChooseFavorite()
             }) {
                 Icon(imageVector = Icons.Default.Star,
-                    tint = if (chat.isFavorite) Color.Yellow else Color.Gray,
+                    tint = if (chat.isFavorite) Color(0xFFB07D2B) else Color.Gray,
                     contentDescription = "add to chosen")
             }
             IconButton(onClick = {

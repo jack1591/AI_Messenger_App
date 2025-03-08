@@ -77,7 +77,7 @@ fun PatternObjectBubble(
                     onSelect()
                 }) {
                     Icon(imageVector = Icons.Default.Star,
-                        tint = if (ragObject.isFavorite) Color.Yellow else Color.Gray,
+                        tint = if (ragObject.isFavorite) Color(0xFFB07D2B) else Color.Gray,
                         contentDescription = "add to chosen")
                 }
 

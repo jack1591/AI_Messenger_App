@@ -1,7 +1,6 @@
 package com.example.aimessengerapp.ViewModel.Chat
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -10,18 +9,13 @@ import com.example.aimessengerapp.ChatModel.ChatObject
 import com.example.aimessengerapp.ChatModel.ChatRepository
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
 import com.example.aimessengerapp.ChatNameModel.ChatEntityRepository
-import com.example.aimessengerapp.RAGRepositories.RAGObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 
 class ChatViewModel(private var chatRepository: ChatRepository, private val entityRepository: ChatEntityRepository): ViewModel() {
     private val _messages = mutableStateListOf<Pair<String,Boolean>>()
@@ -200,5 +194,17 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         _savedListChatIndex.value = index
     }
 
+    //private val _selectedChat = MutableStateFlow<Int?>(0)
+    //val selectedChat: StateFlow<Int?> = _selectedChat.asStateFlow()
 
+    fun selectChat(index: Int){
+        _currentChatIndex.value = index
+    }
+
+    private var _isFavorite = MutableStateFlow<Boolean>(false) // Храним индекс текущего чата
+    val isFavorite: StateFlow<Boolean> = _isFavorite
+
+    fun changeList(){
+        _isFavorite.value = !_isFavorite.value
+    }
 }

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -79,7 +81,7 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "search_location"
                 )
             }
