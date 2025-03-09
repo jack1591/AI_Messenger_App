@@ -20,6 +20,10 @@ import kotlinx.coroutines.flow.first
 //ViewModel для вывода сообщений в конкретном чате и управления чатами
 
 class ChatViewModel(private var chatRepository: ChatRepository, private val entityRepository: ChatEntityRepository): ViewModel() {
+
+    //private val _isLoadingMessages = MutableStateFlow(false)
+    //val isLoadingMessages: StateFlow<Boolean> = _isLoadingMessages
+
     //список сообщений чата
     private val _messages = mutableStateListOf<Pair<String,Boolean>>()
     val messages: List<Pair<String,Boolean>> get() = _messages
@@ -27,6 +31,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     //получение сообщений по номеру чата
     fun getMessagesById(chatId: Int){
         viewModelScope.launch {
+            //_isLoadingMessages.value = true
             chatRepository.getMessages(chatId).collectLatest { chatObjects ->
                 _messages.clear()//очистить список
                 chatObjects.forEach { message ->
@@ -34,6 +39,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
                     addMessage(Pair(message.content,message.type=="request"))
                 }
             }
+            //_isLoadingMessages.value = false
         }
     }
 
@@ -41,6 +47,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     fun insert(message: ChatObject) {
         viewModelScope.launch {
             chatRepository.insert(message)
+            getMessagesById(message.chatId)
         }
     }
 

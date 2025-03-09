@@ -37,8 +37,10 @@ fun MessagesList(listState: LazyListState, chatViewModel: ChatViewModel){
             }
         }
     }
+
     LaunchedEffect(chatViewModel.messages.size) {
-        if (chatViewModel.messages.isNotEmpty())
-            listState.animateScrollToItem(chatViewModel.messages.size-1)
+        if (chatViewModel.messages.isNotEmpty()) {
+            listState.animateScrollToItem(chatViewModel.messages.size - 1)
+        }
     }
 }

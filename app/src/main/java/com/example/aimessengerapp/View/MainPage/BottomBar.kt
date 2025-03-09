@@ -111,7 +111,7 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                     //добавить сообщение в список чата и в бд
                     chatViewModel.insert(ChatObject(content = viewModel.request,type = "request", chatId = numberOfChat))
                     chatViewModel.addMessage(Pair(viewModel.request, true))
-
+                    //chatViewModel.getMessagesById(numberOfChat)
                     //отправить запрос через api
                     val requestModel = RequestModel(viewModel.request)
                     viewModel.getData(requestModel)

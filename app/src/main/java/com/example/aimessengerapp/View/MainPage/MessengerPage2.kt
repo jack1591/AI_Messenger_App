@@ -36,6 +36,8 @@ import com.example.aimessengerapp.ViewModel.MessageViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 import com.example.aimessengerapp.VoiceToTextParser
 import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.min
 
 
 /*
@@ -54,6 +56,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     // Состояние бокового меню (открыто/закрыто)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
 
     // Текущий выбранный чат для редактирования
     var selectedEntity by remember{
@@ -80,6 +83,9 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     val listChatState = rememberLazyListState(
         initialFirstVisibleItemIndex = listChatIndex
     )
+    val visibleIndex by remember {
+        derivedStateOf { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }
+    }
 
     // Флаг переключения между всеми чатами и избранными
     val isFavorite by chatViewModel.isFavorite.collectAsState()
@@ -88,6 +94,11 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
     LaunchedEffect(Unit) {
         if (chatViewModel.currentChatIndex.value == null)
             chatViewModel.determineChatToSelect()
+        if (chatViewModel.chats.isNotEmpty()) {
+            scope.launch {
+                listChatState.animateScrollToItem(chatViewModel.chats.size - 1)
+            }
+        }
     }
 
     // Если текущий чат не выбран - показываем экран загрузки
@@ -106,17 +117,28 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             chatViewModel = chatViewModel,
                             searchChat = searchChat,
                             onClick = {
-                                //находим индекс чата, где произошло совпадение
-                                val foundChatIndex = chatViewModel.chats.indexOfFirst {
-                                    it.name.contains(searchChat, ignoreCase = true)
+
+                                //массив индексов чата, где найдены совпадения
+                                val foundIndexChatList = mutableListOf<Int>()
+                                var num: Int = 0
+                                chatViewModel.chats.forEach{ it->
+                                    //добавляем совпадения в массив
+                                    if (it.name.contains(searchText, ignoreCase = true))
+                                        foundIndexChatList.add(num)
+                                    num++
                                 }
-                                //сохранение индекса чата для прокрутки
-                                if (foundChatIndex != -1) {
-                                    chatViewModel.onSavedListChatIndexChange(foundChatIndex)
-                                    scope.launch {
-                                        listChatState.animateScrollToItem(foundChatIndex)
-                                    }
+                                num = 0
+                                //наименьший индекс чата, который видит пользователь
+                                val visibleItemCount = listChatState.layoutInfo.visibleItemsInfo.firstOrNull()?.index ?: 0 + 1
+                                //находим совпадение, которое находится выше экрана пользователя
+                                while (num<foundIndexChatList.size && foundIndexChatList[num] < visibleItemCount){
+                                    num++
                                 }
+                                //смещаемся
+                                scope.launch {
+                                    listChatState.animateScrollToItem(foundIndexChatList[max(0,num-1)])
+                                }
+
                             }
                         )
 
@@ -198,16 +220,25 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                 chatViewModel = chatViewModel,
                                 searchText = searchText,
                                 onClick = {
-                                    //находим индекс сообщения, в котором нашлось совпадение
-                                    val foundIndex = chatViewModel.messages.indexOfFirst {
-                                        it.first.contains(searchText, ignoreCase = true)
+                                    //массив индексов сообщений, где найдены совпадения
+                                    val foundIndexList = mutableListOf<Int>()
+                                    var num: Int = 0
+                                    chatViewModel.messages.forEach{ it->
+                                        //добавляем совпадения в массив
+                                        if (it.first.contains(searchText, ignoreCase = true))
+                                            foundIndexList.add(num)
+                                        num++
                                     }
-                                    if (foundIndex != -1) {
-                                        //сохранение индекса для прокрутки
-                                        chatViewModel.onSavedListIndexChange(foundIndex)
-                                        scope.launch {
-                                            listState.animateScrollToItem(foundIndex)
-                                        }
+                                    num = 0
+                                    //наименьший индекс сообщения, который видит пользователь
+                                    val visibleItemCount = listState.layoutInfo.visibleItemsInfo.firstOrNull()?.index ?: 0 + 1
+                                    //находим совпадение, которое находится выше экрана пользователя
+                                    while (num<foundIndexList.size && foundIndexList[num] < visibleItemCount){
+                                        num++
+                                    }
+                                    //смещаемся
+                                    scope.launch {
+                                        listState.animateScrollToItem(foundIndexList[max(0,num-1)])
                                     }
                                 })
                         },
