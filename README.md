@@ -56,6 +56,9 @@
 ### Отображение избранных RAG-шаблонов одного типа
 ![photo_5_2025-03-09_22-07-19](https://github.com/user-attachments/assets/5920e51d-43a7-4ce4-8d76-7bc0be3051df)
 
+## Ссылка на видео с демонстрацией приложения
+<https://drive.google.com/file/d/1o19LpuXxLQ0fY5I4AszyYaDjZ7G2cFaI/view?usp=drive_link>
+
 ## Инструкция по запуску
 ### Требования
 Android-studio: <https://developer.android.com/studio>  
@@ -67,4 +70,7 @@ targetSdk = 34
     1. Клонировать репозиторий ```git clone https://github.com/jack1591/AI_Messenger_App.git```  
     2. Открыть проект через Android-Studio  
     3. Запустить приложение на телефоне или эмуляторе
+2. Через apk
+    1. Перейти в releases
+    2. Скачать apk и запустить
 
