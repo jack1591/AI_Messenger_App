@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
     private val baseUrl = "http://94.126.205.209:8000"
 
+    //создание клиента (определение времени)
     private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(120, TimeUnit.SECONDS)
         .readTimeout(120,TimeUnit.SECONDS)

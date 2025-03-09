@@ -13,12 +13,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+//ViewModel для отправки запросов и получения ответов через API
+
 class MessageViewModel : ViewModel() {
 
     private val messageAPI = RetrofitInstance.messageApi
+
+    //результат ответа
     private val _messageResult = MutableLiveData<NetworkResponse<ResponseModel>>()
     val messageResult : LiveData<NetworkResponse<ResponseModel>> = _messageResult
 
+    //запрос
     var request by mutableStateOf("")
 
 
@@ -28,12 +33,12 @@ class MessageViewModel : ViewModel() {
         try{
             viewModelScope.launch {
                 val response = messageAPI.postData(requestModel)
-                if (response.isSuccessful){
+                if (response.isSuccessful){ //если получили ответ
                     response.body()?.let{
-                        _messageResult.value = NetworkResponse.Success(it)
+                        _messageResult.value = NetworkResponse.Success(it) //успех
                     }
                 }
-                else {
+                else { //иначе ошибка
                     _messageResult.value = NetworkResponse.Error("Unable to load data")
                 }
             }
@@ -43,6 +48,7 @@ class MessageViewModel : ViewModel() {
         }
     }
 
+    //очистить ответ
     fun clearResponse(){
         _messageResult.value = NetworkResponse.Waiting
     }

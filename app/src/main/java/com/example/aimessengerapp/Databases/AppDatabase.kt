@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.aimessengerapp.RAGRepositories.RAGDao
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 
-
+// база данных для работы с rag-шаблонами
 private val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

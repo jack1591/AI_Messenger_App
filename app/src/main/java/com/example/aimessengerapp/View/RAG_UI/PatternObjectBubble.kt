@@ -29,18 +29,16 @@ import androidx.compose.ui.unit.sp
 import com.example.aimessengerapp.RAGRepositories.RAGObject
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
+//объект rag-шаблона
+
 @Composable
 fun PatternObjectBubble(
     ragObject: RAGObject,
-    //ragViewModel: RAGViewModel,
     onUpdate: () -> Unit,
     onDelete: () -> Unit,
     onInsert: () -> Unit,
     onSelect: () -> Unit
     ){
-    var showDialog by rememberSaveable{
-        mutableStateOf(false)
-    }
     var isFavorite by remember{mutableStateOf(ragObject.isFavorite)}
 
     Card(
@@ -66,12 +64,16 @@ fun PatternObjectBubble(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
+                //отправить в строку ввода
                 IconButton(onClick = { onInsert() }) {
                     Icon(imageVector = Icons.Default.Done, contentDescription = "send")
                 }
+                //изменить
                 IconButton(onClick = { onUpdate() }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
                 }
+
+                //добавить в избранное
                 IconButton(onClick = {
                     isFavorite = !isFavorite
                     onSelect()
@@ -81,6 +83,7 @@ fun PatternObjectBubble(
                         contentDescription = "add to chosen")
                 }
 
+                //удалить
                 IconButton(onClick = {
                     onDelete()
                 }) {

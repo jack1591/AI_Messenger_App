@@ -27,22 +27,20 @@ import com.example.aimessengerapp.View.RAG_UI.Dialogs.UpdateDialog
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
-
+//список шаблонов текущего type (тип шаблона)
 @Composable
 fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
-    var objectName by rememberSaveable{
-        mutableStateOf("")
-    }
 
+    // Подписываемся на список шаблонов из ViewModel
     val ragObjects by ragViewModel.ragObjects.collectAsState(emptyList())
 
-
+    // Управление видимостью диалоговых окон
     var showDialog by rememberSaveable{
         mutableStateOf(false)
     }
-
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Выбранный объект для редактирования
     var selectedObject by remember { mutableStateOf<RAGObject?>(RAGObject(name = "", type = "default", isFavorite = false)) }
 
     Box(
@@ -57,10 +55,10 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
             verticalArrangement = Arrangement.Center,
         ) {
             items(ragObjects) { ragObject ->
+                //если тип - ALL, выводим все чаты, иначе только избранные
                 if (type==ragObject.type && (typeOfChat=="ALL" || (typeOfChat=="FAVORITE" && ragObject.isFavorite))) {
                     PatternObjectBubble(
                         ragObject = ragObject,
-                        //ragViewModel = ragViewModel,
                         onUpdate = {
                             selectedObject =
                                 ragObject; ragViewModel.update(ragObject); showUpdateDialog = true
@@ -68,7 +66,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
                         onDelete = { ragViewModel.delete(ragObject) },
                         onInsert = {ragViewModel.chooseNameToInsert(Pair(ragObject.name,type))},
                         onSelect = {
-
+                            // Переключение избранного
                             val objectModel = ragObject.copy(isFavorite = !ragObject.isFavorite)
                             ragViewModel.update(objectModel)
                         }
@@ -76,6 +74,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
                 }
             }
 
+            // Если отображаются **все** шаблоны (не только избранные), добавляем кнопку "ADD"
             if (typeOfChat == "ALL") {
                 item {
                     Button(modifier = Modifier
@@ -92,6 +91,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
         }
     }
 
+    //Диалог добавление шаблона
     InsertDialog(
         model = ragViewModel,
         showDialog = showDialog,
@@ -103,6 +103,7 @@ fun PatternScreen(ragViewModel: RAGViewModel, type: String, typeOfChat: String){
             }
         })
 
+    //Диалог редактирования шаблона
     if (selectedObject != null)
         UpdateDialog(
             model = ragViewModel,

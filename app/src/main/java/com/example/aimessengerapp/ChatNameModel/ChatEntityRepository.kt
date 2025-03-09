@@ -5,6 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+//репозиторий для работы с функциями ChatEntityDao
+
 class ChatEntityRepository(private val chatEntityDao: ChatEntityDao) {
 
 
@@ -34,7 +36,4 @@ class ChatEntityRepository(private val chatEntityDao: ChatEntityDao) {
         }
     }
 
-    suspend fun incrementChatClicks(chatId: Int) {
-        chatEntityDao.incrementClick(chatId)
-    }
 }

@@ -17,65 +17,79 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 
+//ViewModel для вывода сообщений в конкретном чате и управления чатами
+
 class ChatViewModel(private var chatRepository: ChatRepository, private val entityRepository: ChatEntityRepository): ViewModel() {
+    //список сообщений чата
     private val _messages = mutableStateListOf<Pair<String,Boolean>>()
     val messages: List<Pair<String,Boolean>> get() = _messages
 
+    //получение сообщений по номеру чата
     fun getMessagesById(chatId: Int){
         viewModelScope.launch {
             chatRepository.getMessages(chatId).collectLatest { chatObjects ->
-                _messages.clear()
+                _messages.clear()//очистить список
                 chatObjects.forEach { message ->
+                    //добавить в чат
                     addMessage(Pair(message.content,message.type=="request"))
                 }
             }
         }
     }
 
+    //добавить сообщение в бд
     fun insert(message: ChatObject) {
         viewModelScope.launch {
             chatRepository.insert(message)
         }
     }
 
+    //добавить сообщение в чат
     fun addMessage(message: Pair<String,Boolean>) {
         _messages.add(message)
     }
 
 
+    //список чатов
     private val _chats = mutableStateListOf<ChatEntity>()
     val chats: List<ChatEntity> = _chats
 
+    //номер текущего чата
     private val _currentChatIndex = MutableStateFlow<Int?>(null) // Храним индекс текущего чата
     val currentChatIndex: StateFlow<Int?> = _currentChatIndex
 
+    //выбор чата - при запуске приложения
     fun determineChatToSelect(){
         viewModelScope.launch {
             val chatList = entityRepository.getAllChats().first().sortedBy { it.indexAt}
 
+            //если у нас нет чатов - создать новый
             if (chatList.isEmpty()){
-                val newChat = ChatEntity(name = "Новый чат 0", indexAt = 0, clicks = 0, isFavorite = false)
+                val newChat = ChatEntity(name = "Новый чат", indexAt = 0, clicks = 0, isFavorite = false)
                 insertChat(newChat)
                 _currentChatIndex.value = 0
                 return@launch
             }
 
+            //взять последний чат (по индексу)
             var lastChat = chatList.last()
 
-
-            Log.i("number of last chat", lastChat.name+" "+lastChat.indexAt.toString())
-            val messages1 = chatRepository.getMessages(lastChat.indexAt).first()
-            if (messages1.isEmpty()){
+            //список сообщений в последнем чате
+            val messagesInChat = chatRepository.getMessages(lastChat.indexAt).first()
+            if (messagesInChat.isEmpty()){
+                //если пусто - выбираем его
                 _currentChatIndex.value = lastChat.indexAt
             }
             else {
+                //если в последнем чате есть сообщения - создаем новый
                 val newChat = ChatEntity(
-                    name = "Новый чат ${lastChat.indexAt+1}",
+                    name = "Новый чат",
                     indexAt = lastChat.indexAt+1,
                     clicks = 0,
                     isFavorite = false
                 )
                 insertChat(newChat)
+                //устанавливаем номер нового чата в качестве значения переменной currentChatIndex
                 _currentChatIndex.value = newChat.indexAt
             }
         }
@@ -91,9 +105,11 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
     }
 
 
+    // номер для сортироки (по дате = индексу, по популярности = число кликов)
     private val _numberOfSort = mutableStateOf(0)
     val numberOfSort = _numberOfSort
 
+    //вывести все чаты по дате
     fun getAllChats(){
         viewModelScope.launch {
             entityRepository.getAllChats().collectLatest { list ->
@@ -106,6 +122,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         }
     }
 
+    //вывести все чаты по популярности
     fun getAllChatsByPopularity() {
         viewModelScope.launch {
             entityRepository.getAllChatsByPopularity().collectLatest { list ->
@@ -118,18 +135,21 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         }
     }
 
+    //добавить чат
     fun insertChat(chatEntity: ChatEntity) {
         viewModelScope.launch {
             entityRepository.insertChat(chatEntity)
         }
     }
 
+    //обновить чат
     fun updateChat(chatEntity: ChatEntity) {
         viewModelScope.launch {
             entityRepository.updateChat(chatEntity)
         }
     }
 
+    //удалить чат
     fun deleteChat(chat: ChatEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.i("chatDelete", chat.indexAt.toString())
@@ -138,33 +158,22 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         }
     }
 
-    /*
-    fun deleteMessagesById(index: Int) {
-        viewModelScope.launch {
-            chatRepository.deleteMessages(index)
-        }
-    }
-     */
-
-    fun incrementChatClicks(chatId: Int) {
-        viewModelScope.launch {
-            entityRepository.incrementChatClicks(chatId)
-        }
-    }
-
-
+    //диалоговое окно для изменения названия чата
     private val _dialogText = MutableStateFlow("")
     val dialogText: StateFlow<String> = _dialogText
 
+    // хранит текст в диалоговом окне редактирования чата
     fun updateDialogText(newText: String) {
         _dialogText.value = newText
     }
 
+    //очистить текст
     fun clearDialogText() {
         _dialogText.value = ""
     }
 
 
+    // переменная для хранения строки поиска сообщений
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
@@ -172,6 +181,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         _searchText.value = text
     }
 
+    //сохранение индекса прокрутки списка сообщений
     private val _savedListIndex = MutableStateFlow(0)
     val savedListIndex = _savedListIndex.asStateFlow()
 
@@ -179,7 +189,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         _savedListIndex.value = index
     }
 
-
+    // переменная для хранения строки поиска чатов
     private val _searchChat = MutableStateFlow("")
     val searchChat = _searchChat.asStateFlow()
 
@@ -187,6 +197,7 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         _searchChat.value = text
     }
 
+    // сохранение индекса прокрутки списка чатов
     private val _savedListChatIndex = MutableStateFlow(0)
     val savedListChatIndex = _savedListChatIndex.asStateFlow()
 
@@ -194,13 +205,12 @@ class ChatViewModel(private var chatRepository: ChatRepository, private val enti
         _savedListChatIndex.value = index
     }
 
-    //private val _selectedChat = MutableStateFlow<Int?>(0)
-    //val selectedChat: StateFlow<Int?> = _selectedChat.asStateFlow()
-
+    // выбор чата по индексу
     fun selectChat(index: Int){
         _currentChatIndex.value = index
     }
 
+    //переменная для выбора списка чатов (избранные или все)
     private var _isFavorite = MutableStateFlow<Boolean>(false) // Храним индекс текущего чата
     val isFavorite: StateFlow<Boolean> = _isFavorite
 

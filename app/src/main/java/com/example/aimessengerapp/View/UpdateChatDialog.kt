@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 
+//диалоговое окно для изменение имени чата
 @Composable
 fun UpdateChatDialog(
     model: ChatViewModel,
@@ -22,7 +23,7 @@ fun UpdateChatDialog(
     val textState by model.dialogText.collectAsState()
     model.updateDialogText(entity.name)
 
-
+    //если показываем диалог
     if (showDialog){
         AlertDialog(
             title = {
@@ -38,9 +39,9 @@ fun UpdateChatDialog(
             onDismissRequest = {  },
             confirmButton = {
                 Button(onClick = {
-                    onConfirm(textState)
-                    model.clearDialogText()
-                    onDismiss()
+                    onConfirm(textState) //изменяем имя на newName
+                    model.clearDialogText() //очищаем содержимое диалога
+                    onDismiss() //выходим
                 }) {
                     Text(text = "OK")
                 }

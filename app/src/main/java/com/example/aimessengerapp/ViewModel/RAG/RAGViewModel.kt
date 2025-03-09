@@ -12,17 +12,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+
+//ViewModel для работы с rag-шаблонами
 class RAGViewModel (
     private val repository: RAGRepository
 ): ViewModel() {
 
-    private val _ragObjects = MutableStateFlow<List<RAGObject>>(emptyList()) // ✅ Используем Flow
+    //шаблоны rag
+    private val _ragObjects = MutableStateFlow<List<RAGObject>>(emptyList())
     val ragObjects: StateFlow<List<RAGObject>> = _ragObjects
 
     init {
         load()
     }
 
+    // загрузка списка шаблонов
     private fun load() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.get().collectLatest { list ->
@@ -31,18 +35,21 @@ class RAGViewModel (
         }
     }
 
+    //вставка шаблона
     fun insert(ragObject: RAGObject) {
         viewModelScope.launch {
             repository.insert(ragObject)
         }
     }
 
+    //удаление шаблона
     fun delete(ragObject: RAGObject) {
         viewModelScope.launch {
             repository.delete(ragObject)
         }
     }
 
+    //изменение шаблона
     fun update(ragObject: RAGObject) {
         viewModelScope.launch {
             repository.update(ragObject)
@@ -50,6 +57,7 @@ class RAGViewModel (
     }
 
 
+    //диалоговое окно для изменения названия шаблона
     private val _dialogText = MutableStateFlow("")
     val dialogText: StateFlow<String> = _dialogText
 
@@ -61,6 +69,7 @@ class RAGViewModel (
         _dialogText.value = ""
     }
 
+    //имя текущего шаблона при вставке
     private var _patternName = mutableStateOf<String>("")
     val patternName = _patternName
 
@@ -69,11 +78,11 @@ class RAGViewModel (
     }
 
 
+    //имя выбранного шаблона при отправлении запроса
     private var _chosenName = mutableStateOf<String>("")
     val chosenName = _chosenName
 
     fun chooseNameToInsert(pair: Pair<String,String>) {
-        Log.i("patternName", pair.second)
         if (pair.second=="Person")
             _chosenName.value = "Imagine that you are a ${pair.first}. "
         else if (pair.second=="Location")
@@ -87,8 +96,10 @@ class RAGViewModel (
         _chosenName.value=""
     }
 
+    //проверка, находимся ли мы в окне выбора rag-шаблонов
     private var _isRAG = mutableStateOf<Boolean>(false)
     val isRAG = _isRAG
+
 
     fun changeRAG() {
         _isRAG.value = !_isRAG.value
@@ -96,11 +107,13 @@ class RAGViewModel (
             choosePatternName("")
     }
 
+    //принудительная установка значения для флага
     fun changeRAG_byvalue(_value: Boolean) {
         _isRAG.value = _value
         choosePatternName("")
     }
 
+    //флаг для выбора типа rag-шаблонов - избранные или все
     private var _ragChat = mutableStateOf<String>("")
     val ragChat = _ragChat
 

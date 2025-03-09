@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
+//диалог добавления нового шаблона
 @Composable
 fun InsertDialog(
     model: RAGViewModel,
@@ -15,12 +16,6 @@ fun InsertDialog(
     onConfirm: (String) -> Unit
 ){
     val textState by model.dialogText.collectAsState()
-
-    /*
-    var textState by rememberSaveable{
-        mutableStateOf("")
-    }
-     */
 
     if (showDialog){
         AlertDialog(
@@ -37,7 +32,9 @@ fun InsertDialog(
             confirmButton = {
                 Button(onClick = {
                     onConfirm(textState)
+                    //очистить текст из диалога
                     model.clearDialogText()
+                    //закрыть диалог
                     onDismiss()
                 }) {
                     Text(text = "OK")

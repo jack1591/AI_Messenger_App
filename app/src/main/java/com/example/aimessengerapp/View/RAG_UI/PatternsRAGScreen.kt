@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
+//Окно выбора 1 из 3 типов rag-шаблонов
 @Composable
 fun PatternsRAGScreen(
     ragViewModel: RAGViewModel

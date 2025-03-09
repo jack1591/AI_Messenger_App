@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// один из 3 типов rag-шаблонов для выбора(человек, цель, окружение)
 @Composable
 fun PatternBubble(
     type: String,

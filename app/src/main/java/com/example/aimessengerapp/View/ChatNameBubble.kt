@@ -26,16 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
 
+//оболочка для каждого чата
 @Composable
 fun ChatNameBubble(
-    chat: ChatEntity,
-    searchChat: String,
-    onClick: () -> Unit,
-    onDelete: () -> Unit,
-    onChooseFavorite: () -> Unit
+    chat: ChatEntity, //чат
+    searchChat: String, //искомый текст (если ищем что-то)
+    onClick: () -> Unit, //нажатие на редактирование
+    onDelete: () -> Unit, //удаление
+    onChooseFavorite: () -> Unit //добавление в избранное/ удаления из избранного
 ){
+    //стркоа для подсветки искомого текста
     var annotatedString: AnnotatedString = buildAnnotatedString {  }
-    //var isFavorite by remember{ mutableStateOf(chat.isFavorite) }
 
     if (searchChat.isNotBlank()){
         val lowerCasename = chat.name.lowercase()
@@ -78,6 +79,7 @@ fun ChatNameBubble(
             Text(text = chat.name)
         else Text(text = annotatedString)
         Row() {
+            //кнопка редактирования чата
             IconButton(onClick = {
                 onClick()
             }) {
@@ -86,14 +88,15 @@ fun ChatNameBubble(
                     contentDescription = "edit name of chat"
                 )
             }
+            // кнопка для избранного
             IconButton(onClick = {
-                //isFavorite = !isFavorite
                 onChooseFavorite()
             }) {
                 Icon(imageVector = Icons.Default.Star,
                     tint = if (chat.isFavorite) Color(0xFFB07D2B) else Color.Gray,
                     contentDescription = "add to chosen")
             }
+            //кнопка удаления
             IconButton(onClick = {
                 onDelete()
             }) {

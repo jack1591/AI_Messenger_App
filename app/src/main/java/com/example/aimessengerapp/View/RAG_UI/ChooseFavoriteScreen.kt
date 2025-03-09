@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+//страница выбора шаблонов - все или избранные
 @Composable
 fun ChooseFavoriteScreen(
     onAll: () -> Unit,

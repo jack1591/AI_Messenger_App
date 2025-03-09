@@ -21,26 +21,31 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun MessageBubble(
-    message: String,
-    searchText: String,
-    isUser: Boolean
+    message: String, //содержимое
+    searchText: String, //искомые текст (если ищем что-то)
+    isUser: Boolean //тип сообщения (запрос или ответ)
 ){
 
+    //строка для подсветки совпадений текущего сообщения с searchText
     var annotatedString: AnnotatedString = buildAnnotatedString {  }
+
     if (searchText.isNotBlank()){
-        val lowerCaseMessage = message.lowercase()
-        val lowerCaseSearch = searchText.lowercase()
+        val lowerCaseMessage = message.lowercase() //сообщения (без регистров)
+        val lowerCaseSearch = searchText.lowercase() //искомый текст (без регистров)
 
         annotatedString = buildAnnotatedString {
             var startIndex = 0
             while (true) {
-                val index = lowerCaseMessage.indexOf(lowerCaseSearch, startIndex)
+                val index = lowerCaseMessage.indexOf(lowerCaseSearch, startIndex) // находим первое вхождение
                 if (index == -1) {
+                    //если нет, то обычная строка
                     append(message.substring(startIndex))
                     break
-                } else {
+                } else { //иначе
+                    //до вхождения - обычный текст
                     append(message.substring(startIndex, index))
                     withStyle(
+                        // совпадающая часть - подсветка
                         style = SpanStyle(
                             background = Color.Yellow,
                             fontWeight = FontWeight.Bold
@@ -48,6 +53,7 @@ fun MessageBubble(
                     ) {
                         append(message.substring(index, index + searchText.length))
                     }
+                    //идем дальше
                     startIndex = index + searchText.length
                 }
             }
@@ -58,9 +64,10 @@ fun MessageBubble(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 6.dp),
+        //если пользователь - сообщения справа, иначе - слева
         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
     ){
-        if (isUser) {
+        if (isUser) {  // у запроса - белый текст на фиолетовом фоне
             Box(
                 modifier = Modifier
                     .background(Color(0xFF6650a4), shape = RoundedCornerShape(12.dp))
@@ -71,7 +78,7 @@ fun MessageBubble(
                 else Text(text = annotatedString, fontSize = 16.sp)
             }
         }
-        else {
+        else { // у ответа - черный текст на сером фоне
             Box(
                 modifier = Modifier
                     .background(Color.LightGray, shape = RoundedCornerShape(12.dp))

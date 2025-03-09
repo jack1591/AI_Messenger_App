@@ -6,7 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+
+//репозиторий для использования методов ChatDao
 class ChatRepository(private val chatDao: ChatDao) {
+
     fun getMessages(chatId: Int): Flow<List<ChatObject>> {
         return chatDao.getMessagesByChatId(chatId)
     }

@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 
-
+//окно изменения имени шаблона
 @Composable
 fun UpdateDialog(
     model: RAGViewModel,
@@ -41,7 +41,9 @@ fun UpdateDialog(
             confirmButton = {
                 Button(onClick = {
                     onConfirm(textState)
+                    //очистить текст из диалога
                     model.clearDialogText()
+                    //закрыть диалог
                     onDismiss()
                 }) {
                     Text(text = "OK")

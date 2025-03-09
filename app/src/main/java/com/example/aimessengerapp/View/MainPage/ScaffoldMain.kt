@@ -1,6 +1,5 @@
-package com.example.aimessengerapp.View
+package com.example.aimessengerapp.View.MainPage
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,16 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.aimessengerapp.RAGRepositories.RAGObject
+import com.example.aimessengerapp.View.MessagesList
 import com.example.aimessengerapp.View.RAG_UI.ChooseFavoriteScreen
-import com.example.aimessengerapp.View.RAG_UI.Dialogs.UpdateDialog
 import com.example.aimessengerapp.View.RAG_UI.PatternScreen
 import com.example.aimessengerapp.View.RAG_UI.PatternsRAGScreen
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
@@ -47,19 +40,6 @@ fun ScaffoldMain(listState: LazyListState, padding: PaddingValues, chatViewModel
                 else PatternsRAGScreen(ragViewModel)
             }
         }
-            /*
-            if (ragViewModel.ragChat.value != "")
-                PatternsRAGScreen(ragViewModel)
-            else {
-                if (!ragViewModel.isRAG.value)
-                    MessagesList(listState, chatViewModel = chatViewModel)
-                else ChooseFavoriteScreen(
-                    onAll = { ragViewModel.chooseAll() },
-                    onFavorite = { ragViewModel.chooseFavorite() }
-                )
-            }
-             */
 
     }
-
 }

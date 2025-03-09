@@ -1,4 +1,4 @@
-package com.example.aimessengerapp.View
+package com.example.aimessengerapp.View.MainPage
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -35,17 +32,14 @@ import com.example.aimessengerapp.VoiceToTextParser
 import com.example.aimessengerapp.api.NetworkResponse
 import com.example.aimessengerapp.api.RequestModel
 
+//строки для отправки сообщений, перехода в rag, использование микрофона
 @Composable
 fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, numberOfChat: Int, voiceToTextParser: VoiceToTextParser){
-    val messageResult = viewModel.messageResult.observeAsState()
-    val state by voiceToTextParser.state.collectAsState()
 
-    /*
-    LaunchedEffect(state.spokenText) {
-        if (state.spokenText.isNotEmpty())
-            viewModel.request += state.spokenText
-    }
-     */
+    //состояние результата
+    val messageResult = viewModel.messageResult.observeAsState()
+    //состояние голосового ввода
+    val state by voiceToTextParser.state.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -58,10 +52,12 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         ) {
+            //если выбрали из rag - добавляем в строку
             if (ragViewModel.chosenName.value!=""){
                 viewModel.request+= ragViewModel.chosenName.value
                 ragViewModel.clearChosenName()
             }
+            //если ввели через микрофон - добавляем в строку
             if (state.spokenText!=""){
                 viewModel.request+= state.spokenText
                 voiceToTextParser.clearSpokenText()
@@ -69,29 +65,34 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
 
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = viewModel.request+state.spokenText,
+                value = viewModel.request+state.spokenText, //добавляем в строку полученный текст
                 onValueChange = {
                     viewModel.request = it
                 },
                 label = {
                     Text(text = "ask something")
                 })
+
             Button(modifier = Modifier
                 .padding(5.dp),
                 onClick = {
+                    //смена режима rag
                     ragViewModel.changeRAG()
+                    //очистить чат
                     ragViewModel.clearChat()
                 }
             ) {
                 Text(text = "RAG", fontSize = 10.sp)
             }
 
+            //использование микрофона
             IconButton(onClick = {
                 if (state.isSpeaking){
                     //voiceToTextParser.stopListening()
                     Log.i("voiceee",state.spokenText)
                 }
                 else {
+                    //если нажали и не активно - начать слушать
                     voiceToTextParser.startListening()
                 }
             }) {
@@ -101,14 +102,17 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                     Icon(imageVector = Icons.Default.Mic, contentDescription = "startSound")
             }
 
+            // кнопка отправки сообщения
             IconButton(onClick = {
+                //убрать rag
                 ragViewModel.changeRAG_byvalue(false)
                 ragViewModel.clearChat()
                 if (viewModel.request.isNotEmpty()) {
+                    //добавить сообщение в список чата и в бд
                     chatViewModel.insert(ChatObject(content = viewModel.request,type = "request", chatId = numberOfChat))
-
                     chatViewModel.addMessage(Pair(viewModel.request, true))
 
+                    //отправить запрос через api
                     val requestModel = RequestModel(viewModel.request)
                     viewModel.getData(requestModel)
                     viewModel.request = ""
@@ -120,10 +124,14 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                 )
             }
         }
+
+        //обработка состояния загрузки сообщений
         when (val result = messageResult.value){
-            is NetworkResponse.Success -> {
+            is NetworkResponse.Success -> { //успешно
+                //добавить ответ в список чата и в бд
                 chatViewModel.insert(ChatObject(content = result.data.response.toString(),type = "response", chatId = numberOfChat))
                 chatViewModel.addMessage(Pair(result.data.response.toString(),false))
+                //очистить содержимое ответа
                 viewModel.clearResponse()
             }
             is NetworkResponse.Error ->{
@@ -133,7 +141,6 @@ fun BottomBar(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragView
                 CircularProgressIndicator()
             }
             is NetworkResponse.Waiting ->{
-
             }
             null -> {}
         }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+// репозиторий для работы с rag-шаблонами
 class RAGRepository(private val ragDao: RAGDao) {
     fun get(): Flow<List<RAGObject>> {
         return ragDao.getAllObjects()

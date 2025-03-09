@@ -9,6 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.aimessengerapp.ChatModel.ChatDao
 import com.example.aimessengerapp.ChatModel.ChatObject
 
+//база данных для работы с сообщениями
 private val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

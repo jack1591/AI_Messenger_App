@@ -14,15 +14,20 @@ import kotlinx.coroutines.flow.update
 import android.Manifest
 import android.util.Log
 
+// RecognitionListener - для перевода голоса в текст
 class VoiceToTextParser(
     private val app: Application
 ): RecognitionListener {
 
+    //Состояние распознавания речи
     private val _state = MutableStateFlow(VoiceToTextParserState())
     val state = _state.asStateFlow()
 
+    //SpeechRecogniser для обработки голоса
     val recogniser = SpeechRecognizer.createSpeechRecognizer(app)
 
+
+    //Очистить текст
     fun clearSpokenText(){
         _state.update {
             it.copy(
@@ -30,21 +35,23 @@ class VoiceToTextParser(
             )
         }
     }
-    fun startListening(languageCode: String = "ru-RU"){
-        _state.update { VoiceToTextParserState() }
 
+    //начать слушать
+    fun startListening(languageCode: String = "ru-RU"){
+        _state.update { VoiceToTextParserState() } //сбрасывание состояния
+
+        //Если недоступен - ошибка
         if (!SpeechRecognizer.isRecognitionAvailable(app)){
-            Log.i("voiceee","Error")
             _state.update{
                 it.copy(error = "Recognition is not available")
             }
+            return
         }
 
-
+        //если нет разрешения на запись аудио - ошибка
         if (ContextCompat.checkSelfPermission(app, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.i("voiceee","Error")
             _state.update {
                 it.copy(error = "Microphone permission not granted")
             }
@@ -52,18 +59,22 @@ class VoiceToTextParser(
         }
 
 
+        //создание Intent'а для распознавателя речи
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply{
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM //свободная речь
                 )
             putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE,languageCode
+                RecognizerIntent.EXTRA_LANGUAGE,languageCode //язык распознавания
             )
-            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, app.packageName)
+            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, app.packageName) //пакет приложения
         }
 
+        //установить слушатель
         recogniser.setRecognitionListener(this)
+
+        //начать слушать с настройками intent
         recogniser.startListening(intent)
 
         _state.update{
@@ -73,6 +84,7 @@ class VoiceToTextParser(
         }
     }
 
+    //установка слушания
     fun stopListening(){
         _state.update {
             it.copy(
@@ -82,6 +94,8 @@ class VoiceToTextParser(
         recogniser.stopListening()
     }
 
+
+    //вызывается когда распознаватель готов к работе
     override fun onReadyForSpeech(params: Bundle?) {
         _state.update {
             it.copy(
@@ -96,6 +110,7 @@ class VoiceToTextParser(
 
     override fun onBufferReceived(buffer: ByteArray?) = Unit
 
+    //завершение речи
     override fun onEndOfSpeech() {
         _state.update {
             it.copy(
@@ -104,9 +119,11 @@ class VoiceToTextParser(
         }
     }
 
+    //ошибка распознавания речт
     override fun onError(error: Int) {
         if (error == SpeechRecognizer.ERROR_CLIENT)
             return
+        //если ошибка не у клиента, вывести код ошибки
         _state.update {
             it.copy(
                 error = "Error: $error"
@@ -114,19 +131,15 @@ class VoiceToTextParser(
         }
     }
 
+    //обработка результатов распознавания речи
     override fun onResults(results: Bundle?) {
-        Log.i("voiceee", "onResults() вызван")
         results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.let { matches ->
             if (matches.isNotEmpty()) {
-                val recognizedText = matches[0]
-                Log.i("voiceee", "Распознанный текст: $recognizedText")
-                _state.update { it.copy(spokenText = recognizedText) }
-                stopListening()
-            } else {
-                Log.e("voiceee", "SpeechRecognizer вернул пустой список")
+                val recognizedText = matches[0] //первый вариант текста
+                _state.update { it.copy(spokenText = recognizedText) } //обновление содержимого состояния
+                stopListening() //закончить слушать
             }
         } ?: Log.e("voiceee", "SpeechRecognizer вернул null")
-
     }
 
     override fun onPartialResults(partialResults: Bundle?) = Unit
@@ -134,8 +147,9 @@ class VoiceToTextParser(
     override fun onEvent(eventType: Int, params: Bundle?) = Unit
 }
 
+//класс парсера
 data class VoiceToTextParserState(
-    val spokenText: String = "",
-    val isSpeaking: Boolean = false,
-    val error: String? = null
+    val spokenText: String = "", //преобразованный текст из речи
+    val isSpeaking: Boolean = false, //проверка, говорит ли человек
+    val error: String? = null //ошибка
 )

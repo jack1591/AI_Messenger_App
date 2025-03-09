@@ -1,24 +1,17 @@
-package com.example.aimessengerapp.View
+package com.example.aimessengerapp.View.MainPage
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,39 +20,53 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.aimessengerapp.ChatNameModel.ChatEntity
+import com.example.aimessengerapp.View.ChatNameBubble
+import com.example.aimessengerapp.View.LoadingScreen
+import com.example.aimessengerapp.View.UpdateChatDialog
 import com.example.aimessengerapp.ViewModel.Chat.ChatViewModel
 import com.example.aimessengerapp.ViewModel.MessageViewModel
 import com.example.aimessengerapp.ViewModel.RAG.RAGViewModel
 import com.example.aimessengerapp.VoiceToTextParser
 import kotlinx.coroutines.launch
 
+
+/*
+    Основной экран:
+    - отображение списка сообщений текущего чата
+    - ввод сообщения
+    - поиск по сообщениям
+    - переход в rag
+    - ввод с микрофона
+    - список чатов
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ragViewModel: RAGViewModel, voiceToTextParser: VoiceToTextParser) {
 
+    // Состояние бокового меню (открыто/закрыто)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    // Текущий выбранный чат для редактирования
     var selectedEntity by remember{
         mutableStateOf(ChatEntity(name = "",indexAt = -1,clicks = 0, isFavorite = false))
     }
 
+    // Флаг для отображения диалога редактирования чата
     var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Подписка на индекс текущего чата
     val currentChatIndex by chatViewModel.currentChatIndex.collectAsState()
 
+    // Состояния для поиска сообщений и чатов
     val searchText by chatViewModel.searchText.collectAsState()
     val listIndex by chatViewModel.savedListIndex.collectAsState()
 
@@ -74,13 +81,16 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
         initialFirstVisibleItemIndex = listChatIndex
     )
 
+    // Флаг переключения между всеми чатами и избранными
     val isFavorite by chatViewModel.isFavorite.collectAsState()
 
+    // Определение чата при запуске приложения
     LaunchedEffect(Unit) {
         if (chatViewModel.currentChatIndex.value == null)
             chatViewModel.determineChatToSelect()
     }
 
+    // Если текущий чат не выбран - показываем экран загрузки
     if (currentChatIndex==null)
         LoadingScreen()
     else {
@@ -91,117 +101,55 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                         modifier = Modifier.fillMaxSize()
                     )  {
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier.padding(start = 15.dp),
-                                value = searchChat,
-                                onValueChange = { newText ->
-                                    chatViewModel.onSearchChatChange(newText)
-                                }
-                            )
-                            IconButton(onClick = {
-
+                        //строка поиска по чатам
+                        SearchChatBar(
+                            chatViewModel = chatViewModel,
+                            searchChat = searchChat,
+                            onClick = {
+                                //находим индекс чата, где произошло совпадение
                                 val foundChatIndex = chatViewModel.chats.indexOfFirst {
                                     it.name.contains(searchChat, ignoreCase = true)
                                 }
+                                //сохранение индекса чата для прокрутки
                                 if (foundChatIndex != -1) {
                                     chatViewModel.onSavedListChatIndexChange(foundChatIndex)
                                     scope.launch {
                                         listChatState.animateScrollToItem(foundChatIndex)
                                     }
                                 }
-                            }) {
-                                Icon(imageVector = Icons.Default.Search, contentDescription = "search for message")
                             }
-
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (!isFavorite)
-                                Text(text = "Все чаты")
-                            else
-                                Text(text = "Избранные чаты")
-
-                            IconButton(onClick = {
-                                chatViewModel.changeList()
-                            }) {
-                                Icon(imageVector = Icons.Default.Star,
-                                    tint = if (isFavorite) Color(0xFFB07D2B) else Color.Gray,
-                                    contentDescription = "add to chosen")
-                            }
-
-                        }
+                        )
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (chatViewModel.numberOfSort.value == 1)
-                                Text(text = "Сортировка по дате")
-                            else if (chatViewModel.numberOfSort.value == 2)
-                                Text(text = "Сортировка по популярности")
-
-                            Row() {
-                                IconButton(onClick = {
-                                    chatViewModel.getAllChats()
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.DateRange,
-                                        contentDescription = "sort by date"
-                                    )
-                                }
-
-                                IconButton(onClick = {
-                                    chatViewModel.getAllChatsByPopularity()
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.ThumbUp,
-                                        contentDescription = "sort by popularity"
-                                    )
-                                }
-                            }
-                        }
+                        //строка выбора чатов (избранные/ все) + строка сортировки
+                        ChooseBar(chatViewModel = chatViewModel, isFavorite = isFavorite)
 
                         Spacer(modifier = Modifier.height(20.dp))
 
+                        //список чатов
                         LazyColumn(
                             state = listChatState
                         ) {
                             itemsIndexed(chatViewModel.chats) { index, item ->
+                                // Фильтрация списка чатов в зависимости от режима (все или избранные)
                                 if ((isFavorite && item.isFavorite) || (!isFavorite)) {
                                     NavigationDrawerItem(
                                         label = {
+                                            //оболочка текущего чата
                                             ChatNameBubble(
-                                                chat = item,
-                                                searchChat = searchChat,
-                                                onClick = {
+                                                chat = item, //чат
+                                                searchChat = searchChat, //строка поиска
+                                                onClick = { //кнопка редактирования
                                                     selectedEntity = item
                                                     showUpdateDialog = true
                                                 },
-                                                onDelete = {
+                                                onDelete = {//удаление
                                                     if (item.indexAt != currentChatIndex) {
                                                         chatViewModel.deleteChat(item)
                                                     }
                                                 },
-                                                onChooseFavorite = {
+                                                onChooseFavorite = {//добавление или удаление из избранного
                                                     val chatModel =
                                                         item.copy(isFavorite = !item.isFavorite)
                                                     chatViewModel.updateChat(chatModel)
@@ -212,12 +160,20 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                                 })
                                         },
                                         selected = item.indexAt == currentChatIndex,
-                                        onClick = {
+                                        onClick = {//нажатие на чат
+
+                                            //выбор чата
                                             chatViewModel.selectChat(item.indexAt)
+                                            //вывод сообщений по чату
                                             chatViewModel.getMessagesById(item.indexAt)
+                                            //очистка строк поиска в чатах и сообщениях
                                             chatViewModel.onSearchChatChange("")
                                             chatViewModel.onSearchTextChange("")
-                                            chatViewModel.incrementChatClicks(currentChatIndex ?: 0)
+                                            //увеличение числа кликов
+                                            val chatModel =
+                                                item.copy(clicks = item.clicks+1)
+                                            chatViewModel.updateChat(chatModel)
+                                            //закрытие бокового меню
                                             scope.launch {
                                                 drawerState.close()
                                             }
@@ -225,45 +181,35 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                                 }
                             }
                         }
+
                     }
                 }
             },
             drawerState = drawerState
         )
 
-
         {
             Scaffold(
                 topBar = {
                     TopAppBar(
                         title = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                OutlinedTextField(
-                                    modifier = Modifier.weight(2f),
-                                    value = searchText,
-                                    onValueChange = { newText ->
-                                        chatViewModel.onSearchTextChange(newText)
-                                    }
-                                )
-                                IconButton(onClick = {
-
+                            //строка поиска сообщений в чате
+                            SearchMessageBar(
+                                chatViewModel = chatViewModel,
+                                searchText = searchText,
+                                onClick = {
+                                    //находим индекс сообщения, в котором нашлось совпадение
                                     val foundIndex = chatViewModel.messages.indexOfFirst {
                                         it.first.contains(searchText, ignoreCase = true)
                                     }
                                     if (foundIndex != -1) {
+                                        //сохранение индекса для прокрутки
                                         chatViewModel.onSavedListIndexChange(foundIndex)
                                         scope.launch {
                                             listState.animateScrollToItem(foundIndex)
                                         }
                                     }
-
-                                }) {
-                                    Icon(imageVector = Icons.Default.Search, contentDescription = "search for message")
-                                }
-                            }
+                                })
                         },
                         navigationIcon = {
                             IconButton(onClick = {
@@ -282,6 +228,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                             .fillMaxWidth()
                             .heightIn(min = 150.dp)
                     ) {
+                        //Строка с вводом сообщений, выбором rag и использованием микрофона
                         BottomBar(
                             viewModel,
                             chatViewModel,
@@ -294,6 +241,7 @@ fun MessengerPage2(viewModel: MessageViewModel, chatViewModel: ChatViewModel, ra
                 }
             ) { padding ->
 
+                //экран для вывода сообщений
                 ScaffoldMain(
                     listState = listState,
                     padding = padding,
